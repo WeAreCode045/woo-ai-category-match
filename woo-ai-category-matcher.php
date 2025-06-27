@@ -29,6 +29,10 @@ define('WAICM_PLUGIN_URL', plugin_dir_url(__FILE__));
  */
 class Woo_AI_Category_Matcher {
     /**
+     * Option key for storing the OpenAI API key
+     */
+    const OPTION_KEY = 'waicm_openai_api_key';
+    /**
      * Instance of the plugin
      *
      * @var Woo_AI_Category_Matcher
@@ -174,21 +178,34 @@ class Woo_AI_Category_Matcher {
      * @param string $hook Current admin page
      */
     public function enqueue_admin_assets($hook) {
-        if (!current_user_can('manage_options')) {
-            wp_die('Unauthorized');
+        // Only load on our plugin pages
+        $plugin_pages = [
+            'toplevel_page_category-matcher',
+            'ai-category-matcher_page_external-category-search',
+            'ai-category-matcher_page_category-matcher-settings'
+        ];
+        
+        if (!in_array($hook, $plugin_pages)) {
+            return;
         }
+        
+        // Enqueue admin styles
+        wp_enqueue_style(
+            'waicm-admin',
+            plugin_dir_url(__FILE__) . 'assets/css/admin.css',
+            [],
+            '1.0.0'
+        );
+        
+        // Get API key for localization
         $api_key = get_option(self::OPTION_KEY);
-        if (!$api_key) {
-            wp_die('OpenAI API key is missing.');
-        }
-        $results = $this->categorize_products_with_ai($api_key);
-        $remaining = $this->count_uncategorized_products();
-        $redirect_url = add_query_arg([
-            'waicm_results' => urlencode(json_encode($results)),
-            'waicm_remaining' => $remaining
-        ], wp_get_referer());
-        wp_redirect($redirect_url);
-        exit;
+        
+        // Localize script with necessary data
+        wp_localize_script('category-matcher', 'waicmData', [
+            'apiKey' => $api_key,
+            'nonce' => wp_create_nonce('waicm_nonce'),
+            'ajaxUrl' => admin_url('admin-ajax.php')
+        ]);
     }
 
     private function categorize_products_with_ai($api_key) {
