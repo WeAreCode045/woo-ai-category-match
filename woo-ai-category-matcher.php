@@ -202,12 +202,37 @@ class Category_Matcher {
         return count($uncat);
     }
     public function enqueue_admin_scripts($hook) {
-        if ($hook !== 'settings_page_waicm') return;
-        wp_enqueue_script('waicm-js', plugins_url('assets/js/waicm.js', __FILE__), ['jquery'], null, true);
-        wp_localize_script('waicm-js', 'waicm', [
+        if ('settings_page_waicm-settings' !== $hook) {
+            return;
+        }
+        
+        wp_enqueue_script('waicm-admin', plugin_dir_url(__FILE__) . 'assets/js/waicm.js', ['jquery'], '1.0.0', true);
+        
+        wp_localize_script('waicm-admin', 'waicm', [
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('waicm_match_chunk'),
-            'ext_nonce' => wp_create_nonce('waicm_ext_check_all'),
+            'nonce' => wp_create_nonce('waicm_nonce'),
+            'ext_nonce' => wp_create_nonce('waicm_ext_nonce')
+        ]);
+    }
+    
+    public function ajax_match_chunk() {
+        check_ajax_referer('waicm_nonce', 'nonce');
+        
+        $api_key = get_option(self::OPTION_KEY);
+        if (!$api_key) {
+            wp_send_json_error(['message' => 'OpenAI API key is missing.']);
+        }
+        
+        $results = $this->categorize_products_with_ai($api_key);
+        $remaining = $this->count_uncategorized_products();
+        
+        wp_send_json_success([
+            'total' => count($results) + $remaining,
+            'processed' => count($results),
+            'remaining' => $remaining,
+            'results' => $results,
+            'no_match_count' => 0,
+            'no_match_products' => []
         ]);
     }
 
