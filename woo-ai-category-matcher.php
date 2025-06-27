@@ -54,26 +54,26 @@ class Category_Matcher {
             <hr>
             <div id="waicm-main-wrap">
                 <!-- Step 1: AI Auto-categorization -->
-                <div id="cai-step1-wrap" style="margin-bottom:30px;padding:15px;border:1px solid #0073aa;background:#f9f9f9;">
+                <div id="waicm-step1-wrap" style="margin-bottom:30px;padding:15px;border:1px solid #0073aa;background:#f9f9f9;">
                     <h3>Step 1: Auto-categorize uncategorized products</h3>
-                    <button id="cai-start-btn" class="button button-primary">Start AI Categorization</button>
-                    <button id="cai-cancel-btn" class="button" style="display:none;">Cancel</button>
-                    <div id="cai-progress-status"></div>
-                    <div id="cai-results-list"></div>
+                    <button id="waicm-start-btn" class="button button-primary">Start AI Categorization</button>
+                    <button id="waicm-cancel-btn" class="button" style="display:none;">Cancel</button>
+                    <div id="waicm-progress-status"></div>
+                    <div id="waicm-results-list"></div>
                 </div>
                 <!-- Step 2: External Site/Category Matching -->
-                <div id="cai-step2-wrap" style="padding:15px;border:1px solid #0073aa;background:#f5faff;">
+                <div id="waicm-step2-wrap" style="padding:15px;border:1px solid #0073aa;background:#f5faff;">
                     <h3>Step 2: Find Categories from External Sites</h3>
-                    <div id="cai-step2-status"></div>
-                    <label>External Site 1 URL: <input type="text" id="cai-ext-url-1" size="40"></label><br>
-                    <label>External Site 2 URL: <input type="text" id="cai-ext-url-2" size="40"></label><br>
+                    <div id="waicm-step2-status"></div>
+                    <label>External Site 1 URL: <input type="text" id="waicm-ext-url-1" size="40"></label><br>
+                    <label>External Site 2 URL: <input type="text" id="waicm-ext-url-2" size="40"></label><br>
                     <label>Instructions for AI (optional):<br>
-                        <textarea id="cai-ext-instructions" rows="2" cols="60" placeholder="E.g.: Categories are in a sidebar, or look for breadcrumbs, etc."></textarea>
+                        <textarea id="waicm-ext-instructions" rows="2" cols="60" placeholder="E.g.: Categories are in a sidebar, or look for breadcrumbs, etc."></textarea>
                     </label><br>
-                    <button id="cai-ext-search-btn" class="button">Check all uncategorized products on external sites</button>
-                    <button id="cai-cancel-btn-step2" class="button" style="display:none;">Cancel</button>
-                    <span id="cai-ext-search-loading" style="display:none;">Checking...</span>
-                    <div id="cai-step2-results"></div>
+                    <button id="waicm-ext-search-btn" class="button">Check all uncategorized products on external sites</button>
+                    <button id="waicm-cancel-btn-step2" class="button" style="display:none;">Cancel</button>
+                    <span id="waicm-ext-search-loading" style="display:none;">Checking...</span>
+                    <div id="waicm-step2-results"></div>
                 </div>
             </div>
         </div>
@@ -91,8 +91,8 @@ class Category_Matcher {
         $results = $this->categorize_products_with_ai($api_key);
         $remaining = $this->count_uncategorized_products();
         $redirect_url = add_query_arg([
-            'cai_results' => urlencode(json_encode($results)),
-            'cai_remaining' => $remaining
+            'waicm_results' => urlencode(json_encode($results)),
+            'waicm_remaining' => $remaining
         ], wp_get_referer());
         wp_redirect($redirect_url);
         exit;
