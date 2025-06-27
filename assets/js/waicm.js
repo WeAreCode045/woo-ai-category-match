@@ -44,10 +44,10 @@ jQuery(document).ready(function($) {
         
         // Prepare the data object
         var postData = {
-            action: 'category_match_chunk',
+            action: 'waicm_match_chunk',
             _ajax_nonce: nonce,
             nonce: nonce,
-            current_chunk: currentChunk
+            current_chunk: currentChunk || 0
         };
         
         console.log('POST data:', postData);
