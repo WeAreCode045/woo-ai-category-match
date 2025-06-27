@@ -31,12 +31,21 @@ jQuery(document).ready(function($) {
     function processChunk(currentChunk = 0) {
         if (!running || cancelRequested) return;
         
+        // Get the nonce from the meta tag as a fallback
+        var nonce = waicm.ajax_nonce || $('meta[name="waicm_nonce"]').attr('value');
+        
+        if (!nonce) {
+            console.error('Security nonce is missing. Please refresh the page and try again.');
+            return;
+        }
+        
         $.ajax({
             url: waicm.ajax_url,
             type: 'POST',
             data: {
                 action: 'category_match_chunk',
-                nonce: waicm.nonce,
+                _ajax_nonce: nonce, // WordPress expects _ajax_nonce for AJAX requests
+                nonce: nonce, // Keep both for backward compatibility
                 current_chunk: currentChunk
             },
             dataType: 'json',
