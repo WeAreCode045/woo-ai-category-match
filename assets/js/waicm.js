@@ -1,162 +1,200 @@
-jQuery(document).ready(function($) {
-    // --- STEP 1: AI Auto-categorization ---
-    var running = false;
-    var cancelRequested = false;
-    var total = 0;
-    var processed = 0;
-    var results = [];
+(function($) {
+    'use strict';
 
-    $('#waicm-start-btn').on('click', function() {
-        if (running) return;
-        running = true;
-        cancelRequested = false;
-        total = 0;
-        processed = 0;
-        results = [];
-        $('#waicm-progress-status').html('<strong>Processing uncategorized products...</strong>');
-        $('#waicm-results-list').empty();
-        $('#waicm-cancel-btn').show().prop('disabled', false);
-        $('#waicm-start-btn').prop('disabled', true);
-        processChunk();
-    });
-
-    $('#waicm-cancel-btn').on('click', function() {
-        cancelRequested = true;
-        running = false;
-        $('#waicm-progress-status').append('<br><span style="color:red;">Process cancelled by user.</span>');
-        $('#waicm-cancel-btn').prop('disabled', true);
-        $('#waicm-start-btn').prop('disabled', false);
-    });
-
-    function processChunk(currentChunk = 0) {
-        if (!running || cancelRequested) return;
-        
-        console.log('Current chunk:', currentChunk);
-
-        // Prepare the data object
-        var postData = {
-            action: 'waicm_match_chunk',
-            current_chunk: currentChunk || 0
-        };
-        
-        console.log('POST data:', postData);
-        
-        // Show loading state
-        $('#waicm-progress-status').html('Processing...');
-        
-        $.ajax({
-            url: waicm.ajax_url,
-            type: 'POST',
-            data: postData,
-            beforeSend: function(xhr) {
-                console.log('AJAX request started');
-                // Add loading class to button
-                $('#waicm-start-btn').prop('disabled', true).text('Processing...');
-            },
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    var data = response.data;
-                    
-                    // Update progress
-                    if (data.results && data.results.length > 0) {
-                        data.results.forEach(function(row) {
-                            $('#waicm-results-list').append('<li><strong>' + row.product + '</strong>: ' + row.category + '</li>');
-                        });
-                    }
-                    
-                    // Calculate progress
-                    var progressPercent = Math.round((data.current_chunk / data.total_chunks) * 100);
-                    var processedInBatch = data.processed;
-                    var chunkSize = data.processed + (data.remaining > 0 ? 0 : data.processed);
-                    var totalProcessed = (data.current_chunk - 1) * chunkSize + processedInBatch;
-                    
-                    // Update UI
-                    $('#waicm-progress-status').html(
-                        '<strong>Progress:</strong> ' + progressPercent + '% ' +
-                        '(' + totalProcessed + ' of ' + data.total_products + ' products)'
-                    );
-                    
-                    // Update progress bar if it exists, or create it
-                    if ($('#waicm-progress-bar').length === 0) {
-                        $('#waicm-progress-status').after(
-                            '<div class="progress" style="height: 20px; margin: 10px 0; background: #f0f0f0; border-radius: 4px; overflow: hidden;">' +
-                            '<div id="waicm-progress-bar" class="progress-bar" role="progressbar" style="width: ' + progressPercent + '%; ' +
-                            'background: #007cba; color: white; text-align: center; line-height: 20px;" ' +
-                            'aria-valuenow="' + progressPercent + '" aria-valuemin="0" aria-valuemax="100">' +
-                            progressPercent + '%</div></div>'
-                        );
-                    } else {
-                        $('#waicm-progress-bar')
-                            .css('width', progressPercent + '%')
-                            .attr('aria-valuenow', progressPercent)
-                            .text(progressPercent + '%');
-                    }
-                    
-                    // Process next chunk if needed
-                    if (data.current_chunk < data.total_chunks && data.remaining > 0) {
-                        setTimeout(function() {
-                            processChunk(data.current_chunk);
-                        }, 1000);
-                    } else {
-                        running = false;
-                        $('#waicm-cancel-btn').hide();
-                        $('#waicm-start-btn').prop('disabled', false);
-                        if (data.remaining > 0) {
-                            $('#waicm-progress-status').append('<p>Completed processing batch. ' + data.remaining + ' products remaining.</p>');
-                        } else {
-                            $('#waicm-progress-status').append('<p style="color:green;">All products processed successfully!</p>');
-                        }
-                    }
-                } else {
-                    running = false;
-                    $('#waicm-cancel-btn').hide();
-                    $('#waicm-progress-status').append('<br><span style="color:red;">Error: ' + (response.data.message || 'Unknown error occurred') + '</span>');
-                    $('#waicm-start-btn').prop('disabled', false);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX Error:', status, error);
-                console.error('Status:', xhr.status);
-                console.error('Response:', xhr.responseText);
-                
-                var errorMsg = 'An error occurred. Please try again.';
-                var debugInfo = '';
-                
-                try {
-                    var response = JSON.parse(xhr.responseText);
-                    console.log('Parsed response:', response);
-                    
-                    if (response.data && response.data.message) {
-                        errorMsg = response.data.message;
-                    } else if (response.message) {
-                        errorMsg = response.message;
-                    }
-                    
-                    // Add debug info if available
-                    if (response.debug) {
-                        debugInfo = '<br><small>Debug: ' + JSON.stringify(response.debug) + '</small>';
-                    }
-                } catch (e) {
-                    console.error('Error parsing error response:', e);
-                    errorMsg = 'Error parsing server response: ' + e.message;
-                }
-                
-                // Show detailed error to user
-                $('#waicm-progress-status').html(
-                    '<div style="color:red; margin:10px 0; padding:10px; background:#fee; border:1px solid #fcc;">' +
-                    '<strong>Error:</strong> ' + errorMsg + 
-                    debugInfo +
-                    '<br><small>Status: ' + xhr.status + ' ' + status + '</small>' +
-                    '</div>'
-                );
-                
-                // Re-enable the button
-                $('#waicm-start-btn').prop('disabled', false).text('Start AI Categorization');
-                
-                running = false;
-                $('#waicm-cancel-btn').hide();
+    // Main plugin object
+    var WAICM = {
+        // Initialize the plugin
+        init: function() {
+            // Check if we're on the external search page
+            if (typeof categoryMatcher !== 'undefined' && categoryMatcher.is_external_search === 'yes') {
+                this.initExternalSearch();
+            } else {
+                this.initAutoCategorization();
             }
-        });
-    }
-});
+        },
+
+        // Initialize auto-categorization functionality
+        initAutoCategorization: function() {
+            var running = false;
+            var cancelRequested = false;
+            var total = 0;
+            var processed = 0;
+            var results = [];
+            var self = this;
+
+            // Initialize UI elements
+            this.initProgressBar();
+            this.initEventHandlers();
+        },
+
+        // Initialize progress bar
+        initProgressBar: function() {
+            if ($('#waicm-progress-container').length === 0) {
+                $('.waicm-progress-status').after(
+                    '<div id="waicm-progress-container" class="waicm-progress">' +
+                    '<div id="waicm-progress-bar" class="waicm-progress-bar">' +
+                    '<span class="waicm-progress-text">0%</span></div></div>'
+                );
+            }
+        },
+
+        // Initialize event handlers
+        initEventHandlers: function() {
+            var self = this;
+            
+            // Start button click handler
+            $('#waicm-start-btn').on('click', function() {
+                self.startProcessing();
+            });
+
+            // Cancel button click handler
+            $('#waicm-cancel-btn').on('click', function() {
+                self.cancelProcessing();
+            });
+        },
+
+        // Start processing products
+        startProcessing: function() {
+            if (this.running) return;
+            
+            this.running = true;
+            this.cancelRequested = false;
+            this.total = 0;
+            this.processed = 0;
+            this.results = [];
+            
+            $('.waicm-progress-status').html('<div class="waicm-loading"></div> <strong>Processing uncategorized products...</strong>');
+            $('#waicm-results-list').empty();
+            $('#waicm-cancel-btn').show().prop('disabled', false);
+            $('#waicm-start-btn').prop('disabled', true);
+            
+            this.processChunk();
+        },
+
+        // Cancel processing
+        cancelProcessing: function() {
+            this.cancelRequested = true;
+            this.running = false;
+            $('.waicm-progress-status').append('<br><span class="waicm-error">Process cancelled by user.</span>');
+            $('#waicm-cancel-btn').prop('disabled', true);
+            $('#waicm-start-btn').prop('disabled', false).text('Start Processing');
+        },
+
+        // Process a chunk of products
+        processChunk: function(currentChunk) {
+            currentChunk = currentChunk || 0;
+            
+            if (!this.running || this.cancelRequested) {
+                return;
+            }
+
+            var self = this;
+            var postData = {
+                action: 'waicm_match_chunk',
+                current_chunk: currentChunk,
+                nonce: categoryMatcher.nonce
+            };
+            
+            $('.waicm-progress-status').html('<div class="waicm-loading"></div> Processing...');
+            
+            $.ajax({
+                url: categoryMatcher.ajax_url,
+                type: 'POST',
+                data: postData,
+                dataType: 'json',
+                beforeSend: function() {
+                    $('#waicm-start-btn').prop('disabled', true).html('<span class="waicm-loading"></span> Processing...');
+                }
+            })
+            .done(function(response) {
+                if (response.success && response.data) {
+                    self.handleChunkResponse(response.data);
+                } else {
+                    self.handleError(response.data || 'An unknown error occurred');
+                }
+            })
+            .fail(function(xhr, status, error) {
+                self.handleError('AJAX request failed: ' + status);
+            });
+        },
+
+        // Handle successful chunk response
+        handleChunkResponse: function(data) {
+            // Update results
+            if (data.results && data.results.length > 0) {
+                data.results.forEach(this.addResult.bind(this));
+                this.scrollToBottom();
+            }
+            
+            // Update progress
+            this.updateProgress(data);
+            
+            // Process next chunk if needed
+            if (data.current_chunk < data.total_chunks && data.remaining > 0) {
+                setTimeout(this.processChunk.bind(this, data.current_chunk), 500);
+            } else {
+                this.completeProcessing();
+            }
+        },
+
+        // Add a result to the results list
+        addResult: function(row) {
+            var statusClass = row.status === 'error' ? 'waicm-error' : 'waicm-success';
+            var statusIcon = row.status === 'error' ? '❌' : '✅';
+            $('#waicm-results-list').append(
+                '<div class="waicm-result-item ' + statusClass + '">' +
+                '<strong>' + row.product + '</strong>: ' + row.message + ' ' + statusIcon +
+                '</div>'
+            );
+        },
+
+        // Scroll to bottom of results
+        scrollToBottom: function() {
+            var resultsContainer = $('#waicm-results');
+            resultsContainer.scrollTop(resultsContainer[0].scrollHeight);
+        },
+
+        // Update progress display
+        updateProgress: function(data) {
+            var progressPercent = Math.min(100, Math.round((data.current_chunk / data.total_chunks) * 100));
+            var totalProcessed = data.total_processed || 0;
+            var totalProducts = data.total_products || 0;
+            
+            $('.waicm-progress-text').text(progressPercent + '%');
+            $('#waicm-progress-bar').css('width', progressPercent + '%');
+            $('.waicm-progress-status').html(
+                '<strong>Progress:</strong> ' + progressPercent + '% ' +
+                '(' + totalProcessed + ' of ' + totalProducts + ' products)'
+            );
+        },
+
+        // Handle errors
+        handleError: function(message) {
+            console.error('Error:', message);
+            $('.waicm-progress-status').append('<div class="waicm-error">Error: ' + message + '</div>');
+            this.running = false;
+            $('#waicm-cancel-btn').hide();
+            $('#waicm-start-btn').prop('disabled', false).text('Start Processing');
+        },
+
+        // Complete processing
+        completeProcessing: function() {
+            this.running = false;
+            $('#waicm-cancel-btn').hide();
+            $('#waicm-start-btn').prop('disabled', false).text('Start Again');
+            $('.waicm-progress-status').append('<div class="waicm-success">Processing complete!</div>');
+        },
+
+        // Initialize external search functionality
+        initExternalSearch: function() {
+            // External search functionality will be implemented here
+            console.log('External search initialized');
+        }
+    };
+
+    // Initialize the plugin when the document is ready
+    $(document).ready(function() {
+        WAICM.init();
+    });
+
+})(jQuery);

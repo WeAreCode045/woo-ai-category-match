@@ -1,0 +1,373 @@
+/* Main Container */
+.waicm-container {
+    max-width: 1200px;
+    margin: 20px 0;
+}
+
+/* Cards */
+.waicm-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    padding: 20px;
+    margin: 20px 0;
+    max-width: 800px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+.waicm-card h2 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Buttons */
+.waicm-button {
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.waicm-button-primary {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+}
+
+.waicm-button-primary:hover {
+    background: #135e96;
+    border-color: #135e96;
+    color: #fff;
+}
+
+/* Progress Bar */
+.waicm-progress {
+    background: #f1f1f1;
+    border: 1px solid #ddd;
+    height: 25px;
+    margin: 10px 0;
+    position: relative;
+    width: 100%;
+}
+
+.waicm-progress-bar {
+    background: #2271b1;
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.waicm-progress-text {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #000;
+    font-weight: bold;
+}
+
+/* Results List */
+.waicm-results {
+    margin-top: 20px;
+}
+
+.waicm-result-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.waicm-result-item.success {
+    background-color: #f0f8ff;
+}
+
+.waicm-result-item.error {
+    background-color: #fff0f0;
+}
+
+/* Form elements */
+.waicm-form-group {
+    margin-bottom: 15px;
+}
+
+.waicm-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.waicm-form-group input[type="text"],
+.waicm-form-group textarea {
+    width: 100%;
+    max-width: 600px;
+}
+
+.waicm-form-group textarea {
+    min-height: 100px;
+}
+
+/* Buttons */
+.waicm-button-group {
+    margin: 20px 0;
+}
+
+.waicm-button-group .button {
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+/* Results */
+.waicm-result-item {
+    padding: 10px;
+    margin: 5px 0;
+    border-left: 4px solid #72aee6;
+    background-color: #f6f7f7;
+}
+
+.waicm-result-item.success {
+    border-left-color: #00a32a;
+}
+
+.waicm-result-item.error {
+    border-left-color: #d63638;
+}
+
+.waicm-result-item.warning {
+    border-left-color: #dba617;
+}
+
+/* Settings Page */
+.waicm-settings-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.waicm-settings-main {
+    flex: 2;
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.waicm-settings-sidebar {
+    flex: 1;
+    min-width: 250px;
+    min-width: 300px;
+}
+
+.waicm-settings-box {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.waicm-settings-box h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Responsive */
+@media (max-width: 782px) {
+    .waicm-settings-container {
+        flex-direction: column;
+    }
+    
+    .waicm-settings-sidebar {
+        margin-top: 20px;
+    }
+    
+    .waicm-settings-main,
+    .waicm-settings-sidebar {
+        width: 100%;
+    }
+}
+
+/* Loading spinner */
+.waicm-spinner {
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Toggle switch for settings */
+.waicm-toggle {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    margin-right: 10px;
+}
+
+.waicm-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.waicm-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.waicm-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .waicm-slider {
+    background-color: #2271b1;
+}
+
+input:focus + .waicm-slider {
+    box-shadow: 0 0 1px #2271b1;
+}
+
+input:checked + .waicm-slider:before {
+    transform: translateX(26px);
+}
+
+/* Field descriptions */
+.waicm-field .description {
+    color: #646970;
+    font-style: italic;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Table styles */
+.waicm-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+}
+
+.waicm-table th,
+.waicm-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.waicm-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.waicm-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Loading Animation */
+@keyframes waicm-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.waicm-loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: waicm-spin 1s linear infinite;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* Toggle Switch */
+.waicm-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    margin-right: 10px;
+}
+
+.waicm-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.waicm-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.waicm-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .waicm-slider {
+    background-color: #2271b1;
+}
+
+input:checked + .waicm-slider:before {
+    transform: translateX(26px);
+}
+
+/* Tooltips */
+.waicm-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+    margin-left: 5px;
+    color: #2271b1;
+}
+
+.waicm-tooltip .waicm-tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.waicm-tooltip:hover .waicm-tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}

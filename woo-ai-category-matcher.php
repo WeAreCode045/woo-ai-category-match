@@ -1,157 +1,179 @@
 <?php
-/*
-Plugin Name: Woo AI Category Matcher
-Plugin URI: https://github.com/WeAreCode045/woo-ai-category-matcher
-Description: Automatically categorize uncategorized WooCommerce products using AI.
-Version: 1.0.5
-Author: Code045
-Author URI: https://code045.nl
-License: Custom – See license.txt
-License URI: https://github.com/WeAreCode045/woo-ai-category-matcher/blob/main/license.txt
+/**
+ * Plugin Name: Woo AI Category Matcher
+ * Description: Automatically categorize WooCommerce products using AI
+ * Version: 1.0.0
+ * Author: Your Name
+ * Author URI: https://yourwebsite.com
+ * Text Domain: woo-ai-category-matcher
+ * Domain Path: /languages
+ * WC requires at least: 3.0.0
+ * WC tested up to: 5.0.0
+ *
+ * @package WooAICategoryMatcher
+ */
 
-GitHub Plugin URI: https://github.com/WeAreCode045/woo-ai-category-matcher
-Primary Branch: main
-*/
+// If this file is called directly, abort.
+if (!defined('WPINC')) {
+    die;
+}
 
-if (!defined('ABSPATH')) exit;
+// Define plugin constants
+define('WAICM_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('WAICM_PLUGIN_URL', plugin_dir_url(__FILE__));
 
-class Category_Matcher {
-    const OPTION_KEY = 'waicm_settings_openai_key';
+/**
+ * Main plugin class
+ */
+class Woo_AI_Category_Matcher {
+    /**
+     * Instance of the plugin
+     *
+     * @var Woo_AI_Category_Matcher
+     */
+    private static $instance = null;
     
-    public function __construct() {
+    /**
+     * Category matcher instance
+     *
+     * @var Category_Matcher
+     */
+    public $category_matcher;
+    
+    /**
+     * External category search instance
+     *
+     * @var External_Category_Search
+     */
+    public $external_search;
+    
+    /**
+     * Get the plugin instance
+     *
+     * @return Woo_AI_Category_Matcher
+     */
+    public static function get_instance() {
+        if (is_null(self::$instance)) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+    
+    /**
+     * Constructor
+     */
+    private function __construct() {
+        // Load required files
+        $this->load_dependencies();
+        
+        // Check if WooCommerce is active
+        if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+            add_action('admin_notices', [$this, 'woocommerce_missing_notice']);
+            return;
+        }
+        
+        // Initialize plugin
+        add_action('plugins_loaded', [$this, 'init_plugin']);
+    }
+    
+    /**
+     * Load required files
+     */
+    private function load_dependencies() {
+        // Include required files
+        require_once WAICM_PLUGIN_DIR . 'includes/class-category-matcher.php';
+        require_once WAICM_PLUGIN_DIR . 'includes/class-external-category-search.php';
+    }
+    
+    /**
+     * Initialize the plugin
+     */
+    public function init_plugin() {
+        // Initialize components
+        $this->category_matcher = new Category_Matcher($this);
+        $this->external_search = new External_Category_Search($this);
+        
+        // Register hooks
+        $this->register_hooks();
+    }
+    
+    /**
+     * Register hooks
+     */
+    private function register_hooks() {
+        // Admin menu
         add_action('admin_menu', [$this, 'add_admin_menu']);
+        
+        // Settings
         add_action('admin_init', [$this, 'register_settings']);
-        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
         
-        // AJAX actions for logged-in users
-        add_action('wp_ajax_waicm_match_chunk', [$this, 'ajax_match_chunk']);
-        
-        // Add nonce for security
-        add_action('admin_head', function() {
-            if (function_exists('wp_create_nonce')) {
-                echo '<meta name="waicm_nonce" value="' . wp_create_nonce('waicm_nonce') . '" />';
-            }
-        });
-        
-        // Include and initialize step 2 functionality
-        require_once plugin_dir_path(__FILE__) . 'woo-ai-category-matcher-step2.php';
-        new Category_Matcher_Step2($this);
+        // Admin scripts and styles
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
     }
     
     /**
-     * AJAX handler to get all uncategorized products
+     * Display WooCommerce missing notice
      */
-    // Moved to Category_Matcher_Step2 class
-
-    public function add_admin_menu() {
-        add_options_page(
-            'Woo AI Category Matcher',
-            'Woo AI Category Matcher',
-            'manage_options',
-            'waicm-settings',
-            [$this, 'render_admin_page'] // Fixed callback method name
-        );
-    }
-
-    public function register_settings() {
-        register_setting('waicm_settings_group', self::OPTION_KEY);
-        
-        add_settings_section(
-            'waicm_settings_section',
-            'AI Category Matcher Settings',
-            [$this, 'settings_section_callback'],
-            'waicm-settings'
-        );
-        
-        add_settings_field(
-            'openai_api_key',
-            'OpenAI API Key',
-            [$this, 'openai_key_callback'],
-            'waicm-settings',
-            'waicm_settings_section'
-        );
-        
-        add_settings_field(
-            'chunk_size',
-            'Processing Chunk Size',
-            [$this, 'chunk_size_callback'],
-            'waicm-settings',
-            'waicm_settings_section',
-            ['label_for' => 'chunk_size']
-        );
-        
-        // Register the chunk size setting
-        register_setting('waicm_settings_group', 'waicm_chunk_size', [
-            'type' => 'integer',
-            'default' => 5,
-            'sanitize_callback' => 'absint'
-        ]);
-    }
-    
-    /**
-     * Settings section callback
-     */
-    public function settings_section_callback() {
-        echo '<p>Configure the settings for the Woo AI Category Matcher plugin.</p>';
-    }
-    
-    /**
-     * OpenAI API Key field callback
-     */
-    public function openai_key_callback() {
-        $api_key = get_option(self::OPTION_KEY, '');
-        echo '<input type="text" id="' . esc_attr(self::OPTION_KEY) . '" name="' . esc_attr(self::OPTION_KEY) . '" value="' . esc_attr($api_key) . '" class="regular-text" />';
-        echo '<p class="description">Enter your OpenAI API key. Get it from <a href="https://platform.openai.com/account/api-keys" target="_blank">OpenAI</a>.</p>';
-    }
-    
-    /**
-     * Chunk size field callback
-     */
-    public function chunk_size_callback() {
-        $chunk_size = get_option('waicm_chunk_size', 5);
-        echo '<input type="number" id="chunk_size" name="waicm_chunk_size" value="' . esc_attr($chunk_size) . '" min="1" max="20" step="1" class="small-text" />';
-        echo '<p class="description">Number of products to process in each batch (1-20). Lower values reduce server load but may be slower.</p>';
-    }
-    
-    public function render_admin_page() {
+    public function woocommerce_missing_notice() {
         ?>
-        <div class="wrap">
-            <h1>Woo AI Category Matcher</h1>
-            <form method="post" action="options.php">
-                <?php settings_fields('waicm_settings_group'); ?>
-                <table class="form-table">
-                    <tr valign="top">
-                        <th scope="row">OpenAI API Key</th>
-                        <td><input type="text" name="<?php echo esc_attr(self::OPTION_KEY); ?>" value="<?php echo esc_attr(get_option(self::OPTION_KEY, '')); ?>" size="60"></td>
-                    </tr>
-                    <tr valign="top">
-                        <th scope="row">Processing Chunk Size</th>
-                        <td><input type="number" name="waicm_chunk_size" value="<?php echo esc_attr(get_option('waicm_chunk_size', 5)); ?>" size="5"></td>
-                    </tr>
-                </table>
-                <?php submit_button(); ?>
-            </form>
-            <hr>
-            <div id="waicm-main-wrap">
-                <!-- Step 1: AI Auto-categorization -->
-                <div id="waicm-step1-wrap" style="margin-bottom:30px;padding:15px;border:1px solid #0073aa;background:#f9f9f9;">
-                    <h3>Step 1: Auto-categorize uncategorized products</h3>
-                    <button id="waicm-start-btn" class="button button-primary">Start AI Categorization</button>
-                    <button id="waicm-cancel-btn" class="button" style="display:none;">Cancel</button>
-                    <div id="waicm-progress-status"></div>
-                    <div id="waicm-results-list"></div>
-                </div>
-                <div style="padding:15px;background:#f5f5f5;border:1px solid #ddd;">
-                    <h3>External Category Matching</h3>
-                    <p>External site category matching has been moved to a separate menu item.</p>
-                    <a href="<?php echo admin_url('admin.php?page=waicm-step2'); ?>" class="button">Go to External Category Matching</a>
-                </div>
-            </div>
+        <div class="notice notice-error">
+            <p><?php _e('Woo AI Category Matcher requires WooCommerce to be installed and activated.', 'woo-ai-category-matcher'); ?></p>
         </div>
         <?php
     }
-
-    public function handle_match_products() {
+    
+    /**
+     * Add admin menu items
+     */
+    public function add_admin_menu() {
+        // Add main menu item
+        add_menu_page(
+            'Woo AI Category Matcher',
+            'AI Category Matcher',
+            'manage_options',
+            'category-matcher',
+            [$this->category_matcher, 'render_page'],
+            'dashicons-category',
+            56
+        );
+        
+        // Add Category Matcher submenu
+        add_submenu_page(
+            'category-matcher',
+            'AI Auto-categorization',
+            'AI Categorization',
+            'manage_options',
+            'category-matcher',
+            [$this->category_matcher, 'render_page']
+        );
+        
+        // Add External Category Search submenu
+        add_submenu_page(
+            'category-matcher',
+            'External Category Search',
+            'External Search',
+            'manage_options',
+            'external-category-search',
+            [$this->external_search, 'render_page']
+        );
+        
+        // Add Settings submenu
+        add_submenu_page(
+            'category-matcher',
+            'AI Category Matcher Settings',
+            'Settings',
+            'manage_options',
+            'category-matcher-settings',
+            [$this, 'render_settings_page']
+        );
+    }
+    
+    /**
+     * Enqueue admin scripts and styles
+     *
+     * @param string $hook Current admin page
+     */
+    public function enqueue_admin_assets($hook) {
         if (!current_user_can('manage_options')) {
             wp_die('Unauthorized');
         }
@@ -272,59 +294,51 @@ class Category_Matcher {
         ]);
         return count($uncat);
     }
+    
     public function enqueue_admin_scripts($hook) {
-        if ('settings_page_waicm-settings' !== $hook) {
+        // Only load on our plugin pages
+        $plugin_pages = [
+            'toplevel_page_category-matcher',
+            'ai-category-matcher_page_external-category-search',
+            'ai-category-matcher_page_category-matcher-settings'
+        ];
+        
+        if (!in_array($hook, $plugin_pages)) {
             return;
         }
         
-        wp_enqueue_script('waicm-admin', plugin_dir_url(__FILE__) . 'assets/js/waicm.js', ['jquery'], '1.0.0', true);
+        // Main plugin script
+        wp_enqueue_script(
+            'category-matcher-admin',
+            plugin_dir_url(__FILE__) . 'assets/js/waicm.js',
+            ['jquery'],
+            '1.0.0',
+            true
+        );
         
-        // Create a nonce for AJAX requests
+        // Localize script with necessary data
         $nonce = wp_create_nonce('waicm_nonce');
-        
-        // Add the nonce to the page as a meta tag for JavaScript
-        wp_add_inline_script('waicm-admin', 'var waicm_nonce = "' . $nonce . '";', 'before');
-        
-        // Localize the script with data
-        wp_localize_script('waicm-admin', 'waicm', [
+        wp_localize_script('category-matcher-admin', 'categoryMatcher', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => $nonce,
-            'ajax_nonce' => $nonce,  // For backward compatibility
-            'admin_ajax' => admin_url('admin-ajax.php')
+            'admin_ajax' => admin_url('admin-ajax.php'),
+            'is_external_search' => (strpos($hook, 'external-category-search') !== false) ? 'yes' : 'no'
         ]);
-    }
-    
-    // Removed duplicate ajax_match_chunk method
-
-    public function ajax_assign_found_cats() {
-        check_ajax_referer('waicm_ext_check_all', 'nonce');
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Unauthorized']);
-        }
-        $updates = isset($_POST['updates']) ? $_POST['updates'] : [];
-        if (empty($updates) || !is_array($updates)) {
-            wp_send_json_error(['message' => 'No updates provided.']);
-        }
-        $errors = [];
-        foreach ($updates as $item) {
-            $prod_id = isset($item['id']) ? intval($item['id']) : 0;
-            $cat_name = isset($item['category']) ? sanitize_text_field($item['category']) : '';
-            if (!$prod_id || !$cat_name) {
-                $errors[] = $prod_id;
-                continue;
-            }
-            $term = get_term_by('name', $cat_name, 'product_cat');
-            if ($term && !is_wp_error($term)) {
-                wp_set_object_terms($prod_id, [$term->term_id], 'product_cat');
-            } else {
-                $errors[] = $prod_id;
-            }
-        }
-        if (empty($errors)) {
-            wp_send_json_success();
-        } else {
-            wp_send_json_error(['message' => 'Could not assign category for product IDs: ' . implode(',', $errors)]);
-        }
+        
+        // Add inline script for nonce
+        wp_add_inline_script(
+            'category-matcher-admin',
+            'var waicm_nonce = "' . $nonce . '";',
+            'before'
+        );
+        
+        // Enqueue styles
+        wp_enqueue_style(
+            'category-matcher-admin',
+            plugin_dir_url(__FILE__) . 'assets/css/admin.css',
+            [],
+            '1.0.0'
+        );
     }
 
     // Moved to Category_Matcher_Step2 class
