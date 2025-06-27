@@ -56,7 +56,6 @@ jQuery(document).ready(function($) {
             url: waicm.ajax_url,
             type: 'POST',
             data: postData,
-            dataType: 'json',
             beforeSend: function(xhr) {
                 console.log('AJAX request started');
             },
