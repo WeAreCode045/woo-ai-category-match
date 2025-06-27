@@ -54,7 +54,8 @@ jQuery(document).ready(function($) {
                     // Calculate progress
                     var progressPercent = Math.round((data.current_chunk / data.total_chunks) * 100);
                     var processedInBatch = data.processed;
-                    var totalProcessed = (data.current_chunk - 1) * 5 + processedInBatch; // 5 is the chunk size
+                    var chunkSize = data.processed + (data.remaining > 0 ? 0 : data.processed);
+                    var totalProcessed = (data.current_chunk - 1) * chunkSize + processedInBatch;
                     
                     // Update UI
                     $('#waicm-progress-status').html(
