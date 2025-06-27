@@ -6,7 +6,7 @@ jQuery(document).ready(function($) {
     var processed = 0;
     var results = [];
 
-    $('#cai-start-btn').on('click', function() {
+    $('#waicm-start-btn').on('click', function() {
         if (running) return;
         running = true;
         cancelRequested = false;
