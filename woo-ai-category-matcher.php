@@ -477,9 +477,15 @@ class Category_Matcher {
     }
 
     public function ajax_match_chunk() {
-        check_ajax_referer('waicm_nonce', 'nonce');
+        // Verify nonce - check both 'nonce' and '_ajax_nonce' parameters
+        $nonce = isset($_REQUEST['nonce']) ? $_REQUEST['nonce'] : (isset($_REQUEST['_ajax_nonce']) ? $_REQUEST['_ajax_nonce'] : '');
+        
+        if (!wp_verify_nonce($nonce, 'waicm_nonce')) {
+            wp_send_json_error(['message' => 'Security check failed. Please refresh the page and try again.']);
+        }
+        
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Unauthorized']);
+            wp_send_json_error(['message' => 'You do not have sufficient permissions to perform this action.']);
         }
         
         $api_key = get_option(self::OPTION_KEY);
