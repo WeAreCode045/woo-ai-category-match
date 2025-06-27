@@ -505,16 +505,9 @@ class Category_Matcher {
             'total_chunks' => $total_chunks,
             'current_chunk' => $current_chunk,
             'total_products' => $total_uncat,
-            'processed' => 0,
-            'remaining' => $total_uncat,
-            'results' => []
-        ]);
-            'total' => $total_uncat,  // Original total uncategorized count
-            'processed' => $processed_count,  // Number of products processed in this batch
-            'remaining' => $remaining,  // Remaining uncategorized products
-            'results' => $results,
-            'no_match_count' => count($no_match_products),
-            'no_match_products' => $no_match_products
+            'processed' => $processed,
+            'remaining' => $remaining,
+            'results' => $results
         ]);
     }
 
