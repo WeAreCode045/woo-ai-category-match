@@ -74,8 +74,11 @@ class Woo_AI_Category_Matcher {
             return;
         }
         
-        // Initialize plugin
-        add_action('plugins_loaded', [$this, 'init_plugin']);
+        // Initialize plugin components
+        $this->init_plugin();
+        
+        // Register hooks
+        $this->register_hooks();
     }
     
     /**
@@ -94,9 +97,6 @@ class Woo_AI_Category_Matcher {
         // Initialize components
         $this->category_matcher = new Category_Matcher($this);
         $this->external_search = new External_Category_Search($this);
-        
-        // Register hooks
-        $this->register_hooks();
     }
     
     /**
@@ -128,25 +128,26 @@ class Woo_AI_Category_Matcher {
      * Add admin menu items
      */
     public function add_admin_menu() {
-        // Add main menu item
-        add_menu_page(
-            'Woo AI Category Matcher',
+        // Add main menu item under WooCommerce
+        add_submenu_page(
+            'woocommerce',
             'AI Category Matcher',
-            'manage_options',
+            'AI Category Matcher',
+            'manage_woocommerce',
+            'category-matcher',
+            [$this->category_matcher, 'render_page'],
+            56
+        );
+        
+        // Add Category Matcher submenu (duplicate for the main menu item)
+        add_menu_page(
+            'AI Category Matcher',
+            'AI Category Matcher',
+            'manage_woocommerce',
             'category-matcher',
             [$this->category_matcher, 'render_page'],
             'dashicons-category',
             56
-        );
-        
-        // Add Category Matcher submenu
-        add_submenu_page(
-            'category-matcher',
-            'AI Auto-categorization',
-            'AI Categorization',
-            'manage_options',
-            'category-matcher',
-            [$this->category_matcher, 'render_page']
         );
         
         // Add External Category Search submenu
