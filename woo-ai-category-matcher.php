@@ -106,9 +106,6 @@ class Woo_AI_Category_Matcher {
         // Admin menu
         add_action('admin_menu', [$this, 'add_admin_menu']);
         
-        // Settings
-        add_action('admin_init', [$this, 'register_settings']);
-        
         // Admin scripts and styles
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
     }
