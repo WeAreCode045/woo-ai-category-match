@@ -30,9 +30,9 @@ jQuery(document).ready(function($) {
 
     function processChunk() {
         if (!running || cancelRequested) return;
-        $.post(caiMatcher.ajax_url, {
-            action: 'cai_match_chunk',
-            nonce: caiMatcher.nonce
+        $.post(waicm.ajax_url, {
+            action: 'waicm_match_chunk',
+            nonce: waicm.nonce
         }, function(response) {
             if (response.success) {
                 total = response.data.total;
