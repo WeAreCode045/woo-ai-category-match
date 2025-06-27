@@ -327,11 +327,20 @@ class Category_Matcher {
         
         wp_enqueue_script('waicm-admin', plugin_dir_url(__FILE__) . 'assets/js/waicm.js', ['jquery'], '1.0.0', true);
         
+        // Create nonces
+        $nonce = wp_create_nonce('waicm_nonce');
+        $ext_nonce = wp_create_nonce('waicm_ext_nonce');
+        
+        // Localize the script with data
         wp_localize_script('waicm-admin', 'waicm', [
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('waicm_nonce'),
-            'ext_nonce' => wp_create_nonce('waicm_ext_nonce')
+            'nonce' => $nonce,
+            'ext_nonce' => $ext_nonce,
+            'ajax_nonce' => $nonce // Add this line for AJAX requests
         ]);
+        
+        // Also set the nonce in a meta tag for reference
+        echo '<meta name="waicm_nonce" value="' . esc_attr($nonce) . '" />';
     }
     
     // Removed duplicate ajax_match_chunk method
