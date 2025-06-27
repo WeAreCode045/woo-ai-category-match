@@ -327,14 +327,18 @@ class Category_Matcher {
         
         wp_enqueue_script('waicm-admin', plugin_dir_url(__FILE__) . 'assets/js/waicm.js', ['jquery'], '1.0.0', true);
         
-        // Create a single nonce for all AJAX requests
+        // Create a nonce for AJAX requests
         $nonce = wp_create_nonce('waicm_nonce');
+        
+        // Add the nonce to the page as a meta tag for JavaScript
+        wp_add_inline_script('waicm-admin', 'var waicm_nonce = "' . $nonce . '";', 'before');
         
         // Localize the script with data
         wp_localize_script('waicm-admin', 'waicm', [
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => $nonce,  // Use the same nonce for all requests
-            'ajax_nonce' => $nonce  // For backward compatibility
+            'nonce' => $nonce,
+            'ajax_nonce' => $nonce,  // For backward compatibility
+            'admin_ajax' => admin_url('admin-ajax.php')
         ]);
     }
     
@@ -372,10 +376,14 @@ class Category_Matcher {
     }
 
     public function ajax_ext_check_all() {
-        // Verify nonce
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'waicm_nonce')) {
-            wp_send_json_error(['message' => 'Security check failed']);
-        }
+        // Verify nonce using check_ajax_referer which is more reliable for AJAX requests
+        check_ajax_referer('waicm_nonce', 'nonce');
+        
+        // Debug logging
+        error_log('AJAX Request Received - Ext Check All');
+        error_log('POST data: ' . print_r($_POST, true));
+        error_log('Current user ID: ' . get_current_user_id());
+        error_log('User can manage options: ' . (current_user_can('manage_options') ? 'Yes' : 'No'));
         
         // Check user capabilities
         if (!current_user_can('manage_options')) {

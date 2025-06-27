@@ -190,59 +190,89 @@ jQuery(document).ready(function($) {
         $loading.show();
         
         // First, get all uncategorized products
-        $.post(waicm.ajax_url, {
-            action: 'waicm_get_uncategorized_products',
-            nonce: waicm.nonce
-        }, function(response) {
-            if (!response.success || !response.data.products || response.data.products.length === 0) {
-                $loading.hide();
-                $button.prop('disabled', false);
-                $('#waicm-step2-results').html('<p>No uncategorized products found.</p>');
-                return;
-            }
-            
-            // Now process these products with the external URLs
-            $.post(waicm.ajax_url, {
-                action: 'waicm_ext_check_all',
-                nonce: waicm.nonce,
-                products: response.data.products,
-                url1: url1,
-                url2: url2,
-                instructions: instructions
-            }, function(processResponse) {
-                $loading.hide();
-                $button.prop('disabled', false);
-                
-                if (processResponse.success) {
-                    var results = processResponse.data.results || [];
-                    if (results.length > 0) {
-                        var resHtml = '<div class="waicm-results">';
-                        resHtml += '<p>Found ' + results.length + ' potential category matches:</p><ul>';
-                        results.forEach(function(prod) {
-                            if (prod && prod.title && prod.category) {
-                                resHtml += '<li><strong>' + prod.title + ':</strong> ' + prod.category + '</li>';
-                            }
-                        });
-                        resHtml += '</ul></div>';
-                        $('#waicm-step2-results').html(resHtml);
-                    } else {
-                        $('#waicm-step2-results').html('<p>No matching categories found for the provided products.</p>');
-                    }
-                } else {
-                    var errorMsg = processResponse.data && processResponse.data.message 
-                        ? processResponse.data.message 
-                        : 'An error occurred while processing the request.';
-                    $('#waicm-step2-results').html('<p style="color:red;">Error: ' + errorMsg + '</p>');
+        $.ajax({
+            url: waicm.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'waicm_get_uncategorized_products',
+                nonce: waicm.nonce
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (!response.success || !response.data.products || response.data.products.length === 0) {
+                    $loading.hide();
+                    $button.prop('disabled', false);
+                    $('#waicm-step2-results').html('<p>No uncategorized products found.</p>');
+                    return;
                 }
-            }).fail(function() {
+
+                // Now process these products with the external URLs
+                $.ajax({
+                    url: waicm.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'waicm_ext_check_all',
+                        nonce: waicm.nonce,
+                        products: response.data.products,
+                        url1: url1,
+                        url2: url2,
+                        instructions: instructions
+                    },
+                    dataType: 'json',
+                    success: function(processResponse) {
+                        $loading.hide();
+                        
+                        if (processResponse.success) {
+                            var results = processResponse.data.results || [];
+                            if (results.length > 0) {
+                                var resHtml = '<div class="waicm-results">';
+                                resHtml += '<p>Found ' + results.length + ' potential category matches:</p><ul>';
+                                results.forEach(function(prod) {
+                                    if (prod && prod.title && prod.category) {
+                                        resHtml += '<li><strong>' + prod.title + ':</strong> ' + prod.category + '</li>';
+                                    }
+                                });
+                                resHtml += '</ul></div>';
+                                $('#waicm-step2-results').html(resHtml);
+                            } else {
+                                $('#waicm-step2-results').html('<p>No matching categories found for the provided products.</p>');
+                            }
+                        } else {
+                            var errorMsg = processResponse.data && processResponse.data.message 
+                                ? processResponse.data.message 
+                                : 'An error occurred while processing the request.';
+                            $('#waicm-step2-results').html('<p style="color:red;">Error: ' + errorMsg + '</p>');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', status, error);
+                        console.error('Response:', xhr.responseText);
+                        
+                        var errorMessage = 'An error occurred while processing your request. ';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage += xhr.responseJSON.message;
+                        } else {
+                            errorMessage += 'Please check the console for more details.';
+                        }
+                        
+                        alert(errorMessage);
+                        $loading.hide();
+                        $button.prop('disabled', false);
+                        $('#waicm-step2-results').html('<p style="color:red;">Failed to process products. Please try again.</p>');
+                    },
+                    complete: function() {
+                        // Re-enable the button
+                        $button.prop('disabled', false);
+                    }
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', status, error);
+                console.error('Response:', xhr.responseText);
                 $loading.hide();
                 $button.prop('disabled', false);
-                $('#waicm-step2-results').html('<p style="color:red;">Failed to process products. Please try again.</p>');
-            });
-        }).fail(function() {
-            $loading.hide();
-            $button.prop('disabled', false);
-            $('#waicm-step2-results').html('<p style="color:red;">Failed to fetch uncategorized products. Please try again.</p>');
+                $('#waicm-step2-results').html('<p style="color:red;">Failed to fetch uncategorized products. Please try again.</p>');
+            }
         });
     });
 });
