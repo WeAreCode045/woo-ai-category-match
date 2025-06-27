@@ -94,8 +94,39 @@ class Category_Matcher {
 
     public function register_settings() {
         register_setting('waicm_settings_group', self::OPTION_KEY);
+        
+        add_settings_section(
+            'waicm_settings_section',
+            'AI Category Matcher Settings',
+            [$this, 'settings_section_callback'],
+            'waicm-settings'
+        );
+        
+        add_settings_field(
+            'openai_api_key',
+            'OpenAI API Key',
+            [$this, 'openai_key_callback'],
+            'waicm-settings',
+            'waicm_settings_section'
+        );
+        
+        add_settings_field(
+            'chunk_size',
+            'Processing Chunk Size',
+            [$this, 'chunk_size_callback'],
+            'waicm-settings',
+            'waicm_settings_section',
+            ['label_for' => 'chunk_size']
+        );
+        
+        // Register the chunk size setting
+        register_setting('waicm_settings_group', 'waicm_chunk_size', [
+            'type' => 'integer',
+            'default' => 5,
+            'sanitize_callback' => 'absint'
+        ]);
     }
-
+    
     public function render_admin_page() {
         ?>
         <div class="wrap">
@@ -106,6 +137,10 @@ class Category_Matcher {
                     <tr valign="top">
                         <th scope="row">OpenAI API Key</th>
                         <td><input type="text" name="<?php echo esc_attr(self::OPTION_KEY); ?>" value="<?php echo esc_attr(get_option(self::OPTION_KEY, '')); ?>" size="60"></td>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row">Processing Chunk Size</th>
+                        <td><input type="number" name="waicm_chunk_size" value="<?php echo esc_attr(get_option('waicm_chunk_size', 5)); ?>" size="5"></td>
                     </tr>
                 </table>
                 <?php submit_button(); ?>
