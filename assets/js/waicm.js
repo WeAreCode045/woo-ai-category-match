@@ -113,12 +113,12 @@ jQuery(document).ready(function($) {
         totalAi = 0;
         processedAi = 0;
         $('#waicm-results-list-ai').empty();
-        $('#cai-progress-bar-ai').css('width', '0%').text('0%');
-        $('#cai-progress-status-ai').text('Starting...');
-        $('#cai-progress-ai').show();
-        $('#cai-progress-bar').css('width', '0%').text('0%');
-        $('#cai-progress-status').text('Starting...');
-        $('#cai-progress').show();
+        $('#waicm-progress-bar-ai').css('width', '0%').text('0%');
+        $('#waicm-progress-status-ai').text('Starting...');
+        $('#waicm-progress-ai').show();
+        $('#waicm-progress-bar').css('width', '0%').text('0%');
+        $('#waicm-progress-status').text('Starting...');
+        $('#waicm-progress').show();
         $(this).prop('disabled', true);
         processChunk();
     });
