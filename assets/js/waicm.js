@@ -45,8 +45,8 @@ jQuery(document).ready(function($) {
                     setTimeout(processChunk, 1000);
                 } else {
                     running = false;
-                    $('#cai-cancel-btn').hide();
-                    $('#cai-start-btn').prop('disabled', false);
+                    $('#waicm-cancel-btn').hide();
+                    $('#waicm-start-btn').prop('disabled', false);
                     if (response.data.no_match_count > 0) {
                         var unmatchedList = $('<ul id="cai-unmatched-list"></ul>');
                         response.data.no_match_products.forEach(function(prod) {
