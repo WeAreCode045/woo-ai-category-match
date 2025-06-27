@@ -489,24 +489,48 @@ class Category_Matcher {
             wp_send_json_error(['message' => $error]);
         }
         
-        // Verify nonce - check both 'nonce' and '_ajax_nonce' parameters
-        $nonce = isset($_POST['nonce']) ? $_POST['nonce'] : (isset($_POST['_ajax_nonce']) ? $_POST['_ajax_nonce'] : '');
-        error_log('Nonce received: ' . $nonce);
+        // Get nonce from headers or POST data
+        $nonce = '';
+        $headers = getallheaders();
         
-        if (empty($nonce)) {
-            $error = 'No nonce provided in the request';
-            error_log($error);
-            wp_send_json_error(['message' => $error]);
+        // Try to get nonce from X-WP-Nonce header
+        if (!empty($headers['X-WP-Nonce'])) {
+            $nonce = $headers['X-WP-Nonce'];
+        } 
+        // Fallback to POST data
+        elseif (!empty($_POST['_ajax_nonce'])) {
+            $nonce = $_POST['_ajax_nonce'];
+        } 
+        // Last resort: check for nonce in the request
+        elseif (!empty($_REQUEST['_wpnonce'])) {
+            $nonce = $_REQUEST['_wpnonce'];
         }
         
-        $verified = wp_verify_nonce($nonce, 'waicm_nonce');
+        error_log('Nonce received: ' . $nonce);
+        error_log('Request headers: ' . print_r($headers, true));
         
-        if ($verified === false) {
+        if (empty($nonce)) {
+            $error = 'No nonce provided in the request. Headers: ' . print_r($headers, true);
+            error_log($error);
+            wp_send_json_error(['message' => 'Security check failed: Missing nonce.']);
+        }
+        
+        // Verify the nonce
+        if (!wp_verify_nonce($nonce, 'waicm_nonce')) {
             $error = 'Nonce verification failed. Received: ' . $nonce . 
                    ', Expected: ' . wp_create_nonce('waicm_nonce') . 
-                   ', Current user ID: ' . get_current_user_id();
+                   ', Current user ID: ' . get_current_user_id() .
+                   ', Is user logged in: ' . (is_user_logged_in() ? 'yes' : 'no');
             error_log($error);
-            wp_send_json_error(['message' => 'Security check failed. Please refresh the page and try again.']);
+            wp_send_json_error([
+                'message' => 'Security check failed. Please refresh the page and try again.',
+                'debug' => [
+                    'received_nonce' => $nonce,
+                    'expected_nonce' => wp_create_nonce('waicm_nonce'),
+                    'user_id' => get_current_user_id(),
+                    'is_logged_in' => is_user_logged_in()
+                ]
+            ]);
         }
         
         if (!current_user_can('manage_options')) {
