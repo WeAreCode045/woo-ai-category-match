@@ -74,10 +74,10 @@ jQuery(document).ready(function($) {
             alert('Please enter at least one URL.');
             return;
         }
-        $('#cai-ext-search-loading').show();
-        $.post(caiMatcher.ajax_url, {
-            action: 'cai_match_chunk',
-            nonce: caiMatcher.nonce
+        $('#waicm-ext-search-loading').show();
+        $.post(waicm.ajax_url, {
+            action: 'waicm_match_chunk',
+            nonce: waicm.nonce
         }, function(response) {
             if (response.success && response.data.no_match_products && response.data.no_match_products.length > 0) {
                 $.post(caiMatcher.ajax_url, {
