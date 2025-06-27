@@ -224,26 +224,7 @@ class Category_Matcher {
         ]);
     }
     
-    public function ajax_match_chunk() {
-        check_ajax_referer('waicm_nonce', 'nonce');
-        
-        $api_key = get_option(self::OPTION_KEY);
-        if (!$api_key) {
-            wp_send_json_error(['message' => 'OpenAI API key is missing.']);
-        }
-        
-        $results = $this->categorize_products_with_ai($api_key);
-        $remaining = $this->count_uncategorized_products();
-        
-        wp_send_json_success([
-            'total' => count($results) + $remaining,
-            'processed' => count($results),
-            'remaining' => $remaining,
-            'results' => $results,
-            'no_match_count' => 0,
-            'no_match_products' => []
-        ]);
-    }
+    // Removed duplicate ajax_match_chunk method
 
     public function ajax_assign_found_cats() {
         check_ajax_referer('waicm_ext_check_all', 'nonce');
