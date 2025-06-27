@@ -358,13 +358,15 @@ class Category_Matcher {
     }
 
     public function ajax_match_chunk() {
-        check_ajax_referer('waicm_match_chunk', 'nonce');
+        check_ajax_referer('waicm_nonce', 'nonce');
+        
         if (!current_user_can('manage_options')) {
             wp_send_json_error(['message' => 'Unauthorized']);
         }
+        
         $api_key = get_option(self::OPTION_KEY);
         if (!$api_key) {
-            wp_send_json_error(['message' => 'OpenAI API key missing.']);
+            wp_send_json_error(['message' => 'OpenAI API key is missing.']);
         }
         $total_before = $this->count_uncategorized_products();
         $uncat_products = get_posts([
