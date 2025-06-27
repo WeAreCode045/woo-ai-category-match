@@ -38,9 +38,9 @@ jQuery(document).ready(function($) {
                 total = response.data.total;
                 processed += response.data.processed;
                 response.data.results.forEach(function(row) {
-                    $('#cai-results-list').append('<li><strong>' + row.product + '</strong>: ' + row.category + '</li>');
+                    $('#waicm-results-list').append('<li><strong>' + row.product + '</strong>: ' + row.category + '</li>');
                 });
-                $('#cai-progress-status').html('<strong>Total processed:</strong> ' + processed + ' / ' + total);
+                $('#waicm-progress-status').html('<strong>Total processed:</strong> ' + processed + ' / ' + total);
                 if (response.data.remaining > 0) {
                     setTimeout(processChunk, 1000);
                 } else {
