@@ -34,7 +34,7 @@ class Category_Matcher {
     }
 
     public function register_settings() {
-        register_setting('cai_matcher_settings', self::OPTION_KEY);
+        register_setting('category_matcher_settings', self::OPTION_KEY);
     }
 
     public function render_admin_page() {
