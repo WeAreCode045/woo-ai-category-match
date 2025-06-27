@@ -40,24 +40,35 @@ jQuery(document).ready(function($) {
             },
             dataType: 'json',
             success: function(response) {
-            if (response.success) {
-                total = response.data.total;
-                processed += response.data.processed;
-                response.data.results.forEach(function(row) {
-                    $('#waicm-results-list').append('<li><strong>' + row.product + '</strong>: ' + row.category + '</li>');
-                });
-                $('#waicm-progress-status').html('<strong>Total processed:</strong> ' + processed + ' / ' + total);
-                if (response.data.remaining > 0) {
-                    setTimeout(processChunk, 1000);
+                if (response.success) {
+                    total = response.data.total;
+                    processed += response.data.processed;
+                    
+                    if (response.data.results && response.data.results.length > 0) {
+                        response.data.results.forEach(function(row) {
+                            $('#waicm-results-list').append('<li><strong>' + row.product + '</strong>: ' + row.category + '</li>');
+                        });
+                    }
+                    
+                    $('#waicm-progress-status').html('<strong>Total processed:</strong> ' + processed + ' / ' + total);
+                    
+                    if (response.data.remaining > 0) {
+                        setTimeout(processChunk, 1000);
+                    } else {
+                        running = false;
+                        $('#waicm-cancel-btn').hide();
+                        $('#waicm-start-btn').prop('disabled', false);
+                        if (response.data.remaining > 0) {
+                            $('#waicm-progress-status').append('<p>Completed processing batch. ' + response.data.remaining + ' products remaining.</p>');
+                        } else {
+                            $('#waicm-progress-status').append('<p style="color:green;">All products processed successfully!</p>');
+                        }
+                    }
                 } else {
                     running = false;
                     $('#waicm-cancel-btn').hide();
+                    $('#waicm-progress-status').append('<br><span style="color:red;">Error: ' + (response.data.message || 'Unknown error occurred') + '</span>');
                     $('#waicm-start-btn').prop('disabled', false);
-                    if (response.data.remaining > 0) {
-                        $('#waicm-progress-status').append('<p>Completed processing batch. ' + response.data.remaining + ' products remaining.</p>');
-                    } else {
-                        $('#waicm-progress-status').append('<p style="color:green;">All products processed successfully!</p>');
-                    }
                 }
             },
             error: function(xhr, status, error) {
@@ -74,11 +85,10 @@ jQuery(document).ready(function($) {
             }
         });
     }
-        });
     }
 
     // --- STEP 2: External Site/Category Matching ---
-    $('#waicm-ext-search-btn').off('click').on('click', function() {
+    $('#waicm-ext-search-btn').on('click', function() {
         var url1 = $('#waicm-ext-url-1').val().trim();
         var url2 = $('#waicm-ext-url-2').val().trim();
         var instructions = $('#waicm-ext-instructions').val().trim();
