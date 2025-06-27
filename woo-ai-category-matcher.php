@@ -1,14 +1,17 @@
 <?php
 /*
 Plugin Name: Woo AI Category Matcher
-Description: Automatically categorizes uncategorized products using AI.
+Plugin URI: https://github.com/jouwgebruikersnaam/woo-ai-category-matcher
+Description: Automatically categorize uncategorized WooCommerce products using AI.
 Version: 1.0.0
-Author: Code045
+Author: Jouw Naam
+Author URI: https://yourwebsite.com
 License: Custom – See license.txt
-License URI: https://github.com/your-repo/woo-ai-category-matcher/blob/main/license.txt
-Text Domain: woo-ai-category-matcher
-*/
+License URI: https://github.com/jouwgebruikersnaam/woo-ai-category-matcher/blob/main/license.txt
 
+GitHub Plugin URI: https://github.com/jouwgebruikersnaam/woo-ai-category-matcher
+Primary Branch: main
+*/
 if (!defined('ABSPATH')) exit;
 
 class Category_Matcher {
