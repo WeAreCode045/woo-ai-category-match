@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
         total = 0;
         processed = 0;
         results = [];
-        $('#cai-progress-status').html('<strong>Processing uncategorized products...</strong>');
+        $('#waicm-progress-status').html('<strong>Processing uncategorized products...</strong>');
         $('#cai-results-list').empty();
         $('#cai-cancel-btn').show().prop('disabled', false);
         $('#cai-start-btn').prop('disabled', true);
