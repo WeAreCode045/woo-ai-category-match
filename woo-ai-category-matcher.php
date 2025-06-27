@@ -180,7 +180,9 @@ class Category_Matcher {
 
     private function call_openai($prompt, $api_key) {
         $body = json_encode([
-            'model' => 'gpt-3.5-turbo',
+            'model' => 'gpt-4.1-nano
+
+',
             'messages' => [
                 ['role' => 'user', 'content' => $prompt]
             ],
