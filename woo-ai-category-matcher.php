@@ -478,9 +478,12 @@ class Category_Matcher {
             wp_send_json_error(['message' => 'OpenAI API key is missing.']);
         }
         
+        // Get chunk size from settings with a default of 5
+        $chunk_size = get_option('waicm_chunk_size', 5);
+        $chunk_size = max(1, min(20, (int)$chunk_size)); // Ensure it's between 1 and 20
+        
         // First, get total count of uncategorized products
         $total_uncat = $this->count_uncategorized_products();
-        $chunk_size = 5; // Process 5 products at a time
         
         if ($total_uncat === 0) {
             wp_send_json_success([
