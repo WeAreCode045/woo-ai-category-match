@@ -28,7 +28,7 @@ class Category_Matcher {
             'Woo AI Category Matcher',
             'Woo AI Category Matcher',
             'manage_options',
-            'waicm_',
+            'waicm_settings',
             [$this, 'render_admin_page'] // Fixed callback method name
         );
     }
