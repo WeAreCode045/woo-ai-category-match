@@ -372,10 +372,15 @@ class Category_Matcher {
         if (!$api_key) {
             wp_send_json_error(['message' => 'OpenAI API key is missing.']);
         }
-        $total_before = $this->count_uncategorized_products();
+        
+        // Get all uncategorized products first to know the total count
+        $total_uncat = $this->count_uncategorized_products();
+        
+        // Process in batches of 5 to avoid timeouts
+        $batch_size = 5;
         $uncat_products = get_posts([
             'post_type' => 'product',
-            'posts_per_page' => 20,
+            'posts_per_page' => $batch_size,
             'tax_query' => [
                 [
                     'taxonomy' => 'product_cat',
@@ -384,6 +389,18 @@ class Category_Matcher {
                 ]
             ]
         ]);
+        
+        if (empty($uncat_products)) {
+            wp_send_json_success([
+                'total' => 0,
+                'processed' => 0,
+                'remaining' => 0,
+                'results' => [],
+                'no_match_count' => 0,
+                'no_match_products' => []
+            ]);
+        }
+        
         $categories = get_terms([
             'taxonomy' => 'product_cat',
             'hide_empty' => false,
@@ -395,9 +412,9 @@ class Category_Matcher {
                 'description' => $cat->description,
             ];
         }, $categories);
+        
         $results = [];
         $no_match_products = [];
-        // Ensure $no_match_products is always an array
         if (!is_array($no_match_products)) $no_match_products = [];
         foreach ($uncat_products as $product) {
             $best_cat = $this->get_best_category_ai($product, $cat_data, $api_key);
