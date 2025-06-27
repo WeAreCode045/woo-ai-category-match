@@ -84,9 +84,9 @@ jQuery(document).ready(function($) {
             instructions: instructions
         }, function(response) {
             if (response.success && response.data.no_match_products && response.data.no_match_products.length > 0) {
-                $.post(caiMatcher.ajax_url, {
-                    action: 'cai_ext_check_all',
-                    nonce: caiMatcher.ext_nonce,
+                $.post(waicm.ajax_url, {
+                    action: 'waicm_ext_check_all',
+                    nonce: waicm.ext_nonce,
                     products: response.data.no_match_products,
                     url1: url1,
                     url2: url2,
