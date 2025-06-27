@@ -409,7 +409,6 @@ class Category_Matcher {
 
     public function ajax_match_chunk() {
         check_ajax_referer('waicm_nonce', 'nonce');
-        
         if (!current_user_can('manage_options')) {
             wp_send_json_error(['message' => 'Unauthorized']);
         }
@@ -419,75 +418,104 @@ class Category_Matcher {
             wp_send_json_error(['message' => 'OpenAI API key is missing.']);
         }
         
-        // Get all uncategorized products first to know the total count
+        // First, get total count of uncategorized products
         $total_uncat = $this->count_uncategorized_products();
+        $chunk_size = 5; // Process 5 products at a time
         
-        // Process in batches of 5 to avoid timeouts
-        $batch_size = 5;
+        if ($total_uncat === 0) {
+            wp_send_json_success([
+                'total_chunks' => 0,
+                'current_chunk' => 0,
+                'total_products' => 0,
+                'processed' => 0,
+                'remaining' => 0,
+                'results' => []
+            ]);
+        }
+        
+        // Calculate chunks
+        $total_chunks = ceil($total_uncat / $chunk_size);
+        $current_chunk = isset($_POST['current_chunk']) ? intval($_POST['current_chunk']) + 1 : 1;
+        
+        // Get products for current chunk
         $uncat_products = get_posts([
             'post_type' => 'product',
-            'posts_per_page' => $batch_size,
+            'posts_per_page' => $chunk_size,
+            'post_status' => 'publish',
+            'fields' => 'all',
+            'offset' => ($current_chunk - 1) * $chunk_size,
             'tax_query' => [
                 [
                     'taxonomy' => 'product_cat',
                     'field' => 'term_id',
                     'terms' => get_term_by('slug', 'uncategorized', 'product_cat')->term_id,
+                    'operator' => 'IN'
                 ]
             ]
         ]);
         
         if (empty($uncat_products)) {
             wp_send_json_success([
-                'total' => 0,
+                'total_chunks' => $total_chunks,
+                'current_chunk' => $current_chunk,
+                'total_products' => $total_uncat,
                 'processed' => 0,
-                'remaining' => 0,
-                'results' => [],
-                'no_match_count' => 0,
-                'no_match_products' => []
+                'remaining' => $total_uncat,
+                'results' => []
             ]);
         }
         
-        $categories = get_terms([
+        $results = [];
+        $cat_data = [];
+        $all_cats = get_terms([
             'taxonomy' => 'product_cat',
             'hide_empty' => false,
         ]);
-        $cat_data = array_map(function($cat) {
-            return [
-                'id' => $cat->term_id,
-                'name' => $cat->name,
-                'description' => $cat->description,
-            ];
-        }, $categories);
         
-        $results = [];
-        $no_match_products = [];
-        $processed_count = 0;
+        foreach ($all_cats as $cat) {
+            $cat_data[] = ['id' => $cat->term_id, 'name' => $cat->name];
+        }
         
+        $unmatched_cat = get_term_by('slug', 'unmatched', 'product_cat');
+        if (!$unmatched_cat) {
+            $unmatched_cat = wp_insert_term('Unmatched', 'product_cat', ['slug' => 'unmatched']);
+            $unmatched_cat_id = is_wp_error($unmatched_cat) ? 0 : $unmatched_cat['term_id'];
+        } else {
+            $unmatched_cat_id = $unmatched_cat->term_id;
+        }
+        
+        $processed = 0;
         foreach ($uncat_products as $product) {
             $best_cat = $this->get_best_category_ai($product, $cat_data, $api_key);
-            $processed_count++;
-            
             if ($best_cat) {
-                // Assign the found category
                 wp_set_object_terms($product->ID, [$best_cat['id']], 'product_cat');
-                $results[] = [
-                    'product' => $product->post_title,
-                    'category' => $best_cat['name'],
-                ];
+                $results[] = ['product' => $product->post_title, 'category' => $best_cat['name']];
             } else {
-                // Add to no match list but still count as processed
-                $no_match_products[] = [
-                    'id' => $product->ID,
-                    'title' => $product->post_title,
-                ];
-                $results[] = [
-                    'product' => $product->post_title,
+                wp_set_object_terms($product->ID, [$unmatched_cat_id], 'product_cat');
+                $results[] = ['product' => $product->post_title, 'category' => 'No match found'];
+            }
+            $processed++;
+            clean_post_cache($product->ID);
+        }
+        
+        // Get updated count of remaining uncategorized products
+        $remaining = $this->count_uncategorized_products();
+        
+        wp_send_json_success([
+            'total_chunks' => $total_chunks,
+            'current_chunk' => $current_chunk,
+            'total_products' => $total_uncat,
+            'processed' => $processed,
+            'remaining' => $remaining,
+            'results' => $results
+        ]);
+    }        'product' => $product->post_title,
                     'category' => 'No match',
                 ];
                 
                 // Move to a special category to avoid reprocessing
                 wp_set_object_terms($product->ID, ['unmatched'], 'product_cat', true);
-            }
+{{ ... }}
             
             // Clear the post cache to ensure fresh data on next query
             clean_post_cache($product->ID);
