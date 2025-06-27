@@ -85,7 +85,6 @@ jQuery(document).ready(function($) {
             }
         });
     }
-    }
 
     // --- STEP 2: External Site/Category Matching ---
     $('#waicm-ext-search-btn').on('click', function() {
@@ -133,15 +132,5 @@ jQuery(document).ready(function($) {
             }
         });
     });
-        totalAi = 0;
-        processedAi = 0;
-        $('#waicm-results-list-ai').empty();
-        $('#waicm-progress-bar-ai').css('width', '0%').text('0%');
-        $('#waicm-progress-status-ai').text('Starting...');
-        $('#waicm-progress-ai').show();
-        $('#waicm-progress-bar').css('width', '0%').text('0%');
-        $('#waicm-progress-status').text('Starting...');
-        $('#waicm-progress').show();
-        $(this).prop('disabled', true);
-        processChunk();
+        // This section was removed as it was causing syntax errors and was redundant with the existing functionality
     });
