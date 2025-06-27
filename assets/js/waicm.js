@@ -92,7 +92,7 @@ jQuery(document).ready(function($) {
                     url2: url2,
                     instructions: instructions
                 }, function(response2) {
-                    $('#cai-ext-search-loading').hide();
+                    $('#waicm-ext-search-loading').hide();
                     if (response2.success) {
                         var resHtml = '<ul>';
                         response2.data.results.forEach(function(prod) {
