@@ -34,7 +34,7 @@ class Category_Matcher {
     }
 
     public function register_settings() {
-        register_setting('waicm_settings', self::OPTION_KEY);
+        register_setting('waicm_settings_group', self::OPTION_KEY);
     }
 
     public function render_admin_page() {
@@ -42,7 +42,7 @@ class Category_Matcher {
         <div class="wrap">
             <h1>Woo AI Category Matcher</h1>
             <form method="post" action="options.php">
-                <?php settings_fields(self::OPTION_KEY); ?>
+                <?php settings_fields('waicm_settings_group'); ?>
                 <table class="form-table">
                     <tr valign="top">
                         <th scope="row">OpenAI API Key</th>
