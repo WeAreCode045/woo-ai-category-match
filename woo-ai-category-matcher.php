@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Woo AI Category Matcher
-Plugin URI: https://github.com/jouwgebruikersnaam/woo-ai-category-matcher
+Plugin URI: https://github.com/WE/woo-ai-category-matcher
 Description: Automatically categorize uncategorized WooCommerce products using AI.
 Version: 1.0.0
 Author: Jouw Naam
