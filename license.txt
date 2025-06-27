@@ -1,0 +1,47 @@
+Woo AI Category Matcher – License Agreement
+
+Copyright (c) 2025 [Your Name or Company]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to use,
+modify, and distribute copies of the Software for non-commercial purposes only,
+subject to the following conditions:
+
+1. Modifications
+
+You may modify the plugin for personal or internal business use. Any modifications
+intended to be shared publicly must be submitted via a valid GitHub pull request
+to the official repository for consideration and review.
+
+2. Commercial Use
+
+This Software may NOT be sold, sublicensed, or included in any commercial product,
+plugin, or service without explicit written permission from the author.
+
+To request commercial usage rights, please open a GitHub issue or contact the
+maintainer directly.
+
+3. Code Reuse in Commercial Plugins
+
+You are NOT permitted to copy or reuse any part of this plugin's source code
+in plugins, tools, or services that are offered commercially without prior
+written approval from the original author.
+
+4. Attribution
+
+You may not remove the original author attribution or this license notice from
+any part of the Software or modified versions.
+
+5. Disclaimer
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+---
+
+For licensing questions or commercial usage inquiries, contact:
+[Your Name or Company] – [Your Contact Email or Website]
