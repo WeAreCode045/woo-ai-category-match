@@ -112,7 +112,7 @@ jQuery(document).ready(function($) {
     });
         totalAi = 0;
         processedAi = 0;
-        $('#cai-results-list-ai').empty();
+        $('#waicm-results-list-ai').empty();
         $('#cai-progress-bar-ai').css('width', '0%').text('0%');
         $('#cai-progress-status-ai').text('Starting...');
         $('#cai-progress-ai').show();
