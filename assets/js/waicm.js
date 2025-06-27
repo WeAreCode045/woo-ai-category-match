@@ -30,10 +30,16 @@ jQuery(document).ready(function($) {
 
     function processChunk() {
         if (!running || cancelRequested) return;
-        $.post(waicm.ajax_url, {
-            action: 'waicm_match_chunk',
-            nonce: waicm.nonce
-        }, function(response) {
+        
+        $.ajax({
+            url: waicm.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'category_match_chunk',
+                nonce: waicm.nonce
+            },
+            dataType: 'json',
+            success: function(response) {
             if (response.success) {
                 total = response.data.total;
                 processed += response.data.processed;
@@ -47,20 +53,27 @@ jQuery(document).ready(function($) {
                     running = false;
                     $('#waicm-cancel-btn').hide();
                     $('#waicm-start-btn').prop('disabled', false);
-                    if (response.data.no_match_count > 0) {
-                        var unmatchedList = $('<ul id="waicm-unmatched-list"></ul>');
-                        response.data.no_match_products.forEach(function(prod) {
-                            unmatchedList.append('<li>' + prod.title + '</li>');
-                        });
-                        $('#waicm-progress-status').append(unmatchedList);
+                    if (response.data.remaining > 0) {
+                        $('#waicm-progress-status').append('<p>Completed processing batch. ' + response.data.remaining + ' products remaining.</p>');
+                    } else {
+                        $('#waicm-progress-status').append('<p style="color:green;">All products processed successfully!</p>');
                     }
                 }
-            } else {
+            },
+            error: function(xhr, status, error) {
                 running = false;
                 $('#waicm-cancel-btn').hide();
-                $('#waicm-progress-status').append('<br><span style="color:red;">Error: ' + response.data.message + '</span>');
+                var errorMessage = 'An error occurred';
+                if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+                    errorMessage = xhr.responseJSON.data.message;
+                } else if (xhr.statusText) {
+                    errorMessage = xhr.statusText;
+                }
+                $('#waicm-progress-status').append('<br><span style="color:red;">Error: ' + errorMessage + '</span>');
                 $('#waicm-start-btn').prop('disabled', false);
             }
+        });
+    }
         });
     }
 
