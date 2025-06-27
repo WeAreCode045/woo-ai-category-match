@@ -478,4 +478,7 @@ class Woo_AI_Category_Matcher {
 
 }
 
-new Woo_AI_Category_Matcher();
+// Initialize the plugin
+add_action('plugins_loaded', function() {
+    Woo_AI_Category_Matcher::get_instance();
+});
