@@ -7,9 +7,9 @@ Version: 1.0.0
 Author: Code045
 Author URI: https://code045.nl
 License: Custom – See license.txt
-License URI: https://github.com/jouwgebruikersnaam/woo-ai-category-matcher/blob/main/license.txt
+License URI: https://github.com/WeAreCode045/woo-ai-category-matcher/blob/main/license.txt
 
-GitHub Plugin URI: https://github.com/jouwgebruikersnaam/woo-ai-category-matcher
+GitHub Plugin URI: https://github.com/WeAreCode045/woo-ai-category-matcher
 Primary Branch: main
 */
 if (!defined('ABSPATH')) exit;
