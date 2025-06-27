@@ -27,6 +27,7 @@ class Category_Matcher {
         add_action('wp_ajax_category_match_chunk', [$this, 'ajax_match_chunk']);
         add_action('wp_ajax_category_ext_check_all', [$this, 'ajax_ext_check_all']);
         add_action('wp_ajax_category_assign_found_cats', [$this, 'ajax_assign_found_cats']);
+        add_action('wp_ajax_waicm_get_uncategorized_products', [$this, 'ajax_get_uncategorized_products']);
         
         // Add nonce for security
         add_action('admin_head', function() {
@@ -34,6 +35,51 @@ class Category_Matcher {
                 echo '<meta name="waicm_nonce" value="' . wp_create_nonce('waicm_nonce') . '" />';
             }
         });
+    }
+    
+    /**
+     * AJAX handler to get all uncategorized products
+     */
+    public function ajax_get_uncategorized_products() {
+        check_ajax_referer('waicm_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized']);
+        }
+        
+        $uncat_products = get_posts([
+            'post_type' => 'product',
+            'posts_per_page' => -1,
+            'post_status' => 'publish',
+            'fields' => 'ids',
+            'tax_query' => [
+                [
+                    'taxonomy' => 'product_cat',
+                    'field' => 'term_id',
+                    'terms' => get_term_by('slug', 'uncategorized', 'product_cat')->term_id,
+                    'operator' => 'IN'
+                ]
+            ]
+        ]);
+        
+        if (empty($uncat_products)) {
+            wp_send_json_success(['products' => []]);
+        }
+        
+        // Get product details
+        $products = [];
+        foreach ($uncat_products as $product_id) {
+            $product = wc_get_product($product_id);
+            if ($product) {
+                $products[] = [
+                    'id' => $product_id,
+                    'title' => $product->get_name(),
+                    'description' => $product->get_description()
+                ];
+            }
+        }
+        
+        wp_send_json_success(['products' => $products]);
     }
 
     public function add_admin_menu() {
