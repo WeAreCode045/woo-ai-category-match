@@ -74,23 +74,41 @@ jQuery(document).ready(function($) {
             },
             error: function(xhr, status, error) {
                 console.error('AJAX Error:', status, error);
+                console.error('Status:', xhr.status);
                 console.error('Response:', xhr.responseText);
                 
-                // Parse the response if possible
                 var errorMsg = 'An error occurred. Please try again.';
+                var debugInfo = '';
+                
                 try {
                     var response = JSON.parse(xhr.responseText);
+                    console.log('Parsed response:', response);
+                    
                     if (response.data && response.data.message) {
                         errorMsg = response.data.message;
                     } else if (response.message) {
                         errorMsg = response.message;
                     }
+                    
+                    // Add debug info if available
+                    if (response.debug) {
+                        debugInfo = '<br><small>Debug: ' + JSON.stringify(response.debug) + '</small>';
+                    }
                 } catch (e) {
                     console.error('Error parsing error response:', e);
+                    errorMsg = 'Error parsing server response: ' + e.message;
                 }
                 
-                // Show error to user
-                $('#waicm-progress-status').html('<span style="color:red;">Error: ' + errorMsg + '</span>');
+                // Show detailed error to user
+                $('#waicm-progress-status').html(
+                    '<div style="color:red; margin:10px 0; padding:10px; background:#fee; border:1px solid #fcc;">' +
+                    '<strong>Error:</strong> ' + errorMsg + 
+                    debugInfo +
+                    '<br><small>Status: ' + xhr.status + ' ' + status + '</small>' +
+                    '</div>'
+                );
+                
+                // Re-enable the button
                 $('#waicm-start-btn').prop('disabled', false).text('Start AI Categorization');
             },
             dataType: 'json',
