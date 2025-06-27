@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
         $('#waicm-start-btn').prop('disabled', false);
     });
 
-    function processChunk() {
+    function processChunk(currentChunk = 0) {
         if (!running || cancelRequested) return;
         
         $.ajax({
@@ -36,30 +36,59 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'category_match_chunk',
-                nonce: waicm.nonce
+                nonce: waicm.nonce,
+                current_chunk: currentChunk
             },
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    total = response.data.total;
-                    processed += response.data.processed;
+                    var data = response.data;
                     
-                    if (response.data.results && response.data.results.length > 0) {
-                        response.data.results.forEach(function(row) {
+                    // Update progress
+                    if (data.results && data.results.length > 0) {
+                        data.results.forEach(function(row) {
                             $('#waicm-results-list').append('<li><strong>' + row.product + '</strong>: ' + row.category + '</li>');
                         });
                     }
                     
-                    $('#waicm-progress-status').html('<strong>Total processed:</strong> ' + processed + ' / ' + total);
+                    // Calculate progress
+                    var progressPercent = Math.round((data.current_chunk / data.total_chunks) * 100);
+                    var processedInBatch = data.processed;
+                    var totalProcessed = (data.current_chunk - 1) * 5 + processedInBatch; // 5 is the chunk size
                     
-                    if (response.data.remaining > 0) {
-                        setTimeout(processChunk, 1000);
+                    // Update UI
+                    $('#waicm-progress-status').html(
+                        '<strong>Progress:</strong> ' + progressPercent + '% ' +
+                        '(' + totalProcessed + ' of ' + data.total_products + ' products)'
+                    );
+                    
+                    // Update progress bar if it exists, or create it
+                    if ($('#waicm-progress-bar').length === 0) {
+                        $('#waicm-progress-status').after(
+                            '<div class="progress" style="height: 20px; margin: 10px 0; background: #f0f0f0; border-radius: 4px; overflow: hidden;">' +
+                            '<div id="waicm-progress-bar" class="progress-bar" role="progressbar" style="width: ' + progressPercent + '%; ' +
+                            'background: #007cba; color: white; text-align: center; line-height: 20px;" ' +
+                            'aria-valuenow="' + progressPercent + '" aria-valuemin="0" aria-valuemax="100">' +
+                            progressPercent + '%</div></div>'
+                        );
+                    } else {
+                        $('#waicm-progress-bar')
+                            .css('width', progressPercent + '%')
+                            .attr('aria-valuenow', progressPercent)
+                            .text(progressPercent + '%');
+                    }
+                    
+                    // Process next chunk if needed
+                    if (data.current_chunk < data.total_chunks && data.remaining > 0) {
+                        setTimeout(function() {
+                            processChunk(data.current_chunk);
+                        }, 1000);
                     } else {
                         running = false;
                         $('#waicm-cancel-btn').hide();
                         $('#waicm-start-btn').prop('disabled', false);
-                        if (response.data.remaining > 0) {
-                            $('#waicm-progress-status').append('<p>Completed processing batch. ' + response.data.remaining + ' products remaining.</p>');
+                        if (data.remaining > 0) {
+                            $('#waicm-progress-status').append('<p>Completed processing batch. ' + data.remaining + ' products remaining.</p>');
                         } else {
                             $('#waicm-progress-status').append('<p style="color:green;">All products processed successfully!</p>');
                         }
