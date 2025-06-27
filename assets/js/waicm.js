@@ -39,14 +39,30 @@ jQuery(document).ready(function($) {
             return;
         }
         
+        console.log('Sending AJAX request with nonce:', nonce);
+        console.log('Current chunk:', currentChunk);
+        
+        // Prepare the data object
+        var postData = {
+            action: 'category_match_chunk',
+            _ajax_nonce: nonce,
+            nonce: nonce,
+            current_chunk: currentChunk
+        };
+        
+        console.log('POST data:', postData);
+        
         $.ajax({
             url: waicm.ajax_url,
             type: 'POST',
-            data: {
-                action: 'category_match_chunk',
-                _ajax_nonce: nonce, // WordPress expects _ajax_nonce for AJAX requests
-                nonce: nonce, // Keep both for backward compatibility
-                current_chunk: currentChunk
+            data: postData,
+            dataType: 'json',
+            beforeSend: function(xhr) {
+                console.log('AJAX request started');
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', status, error);
+                console.error('Response:', xhr.responseText);
             },
             dataType: 'json',
             success: function(response) {
