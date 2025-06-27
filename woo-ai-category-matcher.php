@@ -12,7 +12,7 @@ Text Domain: woo-ai-category-matcher
 if (!defined('ABSPATH')) exit;
 
 class Category_Matcher {
-    const OPTION_KEY = 'waicm_settingsopenai_key';
+    const OPTION_KEY = 'waicm_settings_openai_key';
     
     public function __construct() {
         add_action('admin_menu', [$this, 'add_admin_menu']);
