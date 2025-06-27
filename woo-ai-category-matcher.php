@@ -12,7 +12,7 @@ Text Domain: woo-ai-category-matcher
 if (!defined('ABSPATH')) exit;
 
 class Category_Matcher {
-    const OPTION_KEY = 'category_matcher_openai_key';
+    const OPTION_KEY = 'waicm_openai_key';
     
     public function __construct() {
         add_action('admin_menu', [$this, 'add_admin_menu']);
@@ -28,13 +28,13 @@ class Category_Matcher {
             'Woo AI Category Matcher',
             'Woo AI Category Matcher',
             'manage_options',
-            'category-matcher',
+            'waicm-settings',
             [$this, 'render_admin_page'] // Fixed callback method name
         );
     }
 
     public function register_settings() {
-        register_setting('category_matcher_settings', self::OPTION_KEY);
+        register_setting('waicm_settings', self::OPTION_KEY);
     }
 
     public function render_admin_page() {
@@ -202,9 +202,9 @@ class Category_Matcher {
         return count($uncat);
     }
     public function enqueue_admin_scripts($hook) {
-        if ($hook !== 'settings_page_category-ai-matcher') return;
-        wp_enqueue_script('waicm-matcher-js', plugins_url('wp-category-ai-matcher.js', __FILE__), ['jquery'], null, true);
-        wp_localize_script('waicm-matcher-js', 'waicmMatcher', [
+        if ($hook !== 'settings_page_waicm') return;
+        wp_enqueue_script('waicm-js', plugins_url('assets/js/waicm.js', __FILE__), ['jquery'], null, true);
+        wp_localize_script('waicm-js', 'waicm', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('waicm_match_chunk'),
             'ext_nonce' => wp_create_nonce('waicm_ext_check_all'),
@@ -407,4 +407,4 @@ class Category_Matcher {
 
 }
 
-new Category_Ai_Matcher();
+new Category_Matcher();
