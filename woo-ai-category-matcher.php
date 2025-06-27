@@ -376,8 +376,18 @@ class Category_Matcher {
     }
 
     public function ajax_ext_check_all() {
+        // Set a higher time limit for this request
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(300); // 5 minutes
+        }
+        
         // Verify nonce using check_ajax_referer which is more reliable for AJAX requests
-        check_ajax_referer('waicm_nonce', 'nonce');
+        try {
+            check_ajax_referer('waicm_nonce', 'nonce');
+        } catch (Exception $e) {
+            error_log('Nonce verification failed: ' . $e->getMessage());
+            wp_send_json_error(['message' => 'Security check failed. Please refresh the page and try again.']);
+        }
         
         // Debug logging
         error_log('AJAX Request Received - Ext Check All');
@@ -388,6 +398,11 @@ class Category_Matcher {
         // Check user capabilities
         if (!current_user_can('manage_options')) {
             wp_send_json_error(['message' => 'Unauthorized']);
+        }
+        
+        // Check if we have required data
+        if (empty($_POST['products']) || !is_array($_POST['products'])) {
+            wp_send_json_error(['message' => 'No products to process']);
         }
         $api_key = get_option(self::OPTION_KEY);
         if (!$api_key) {

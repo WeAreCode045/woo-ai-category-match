@@ -218,6 +218,7 @@ jQuery(document).ready(function($) {
                         url2: url2,
                         instructions: instructions
                     },
+                    timeout: 240000, // 4 minutes timeout
                     dataType: 'json',
                     success: function(processResponse) {
                         $loading.hide();
@@ -269,9 +270,17 @@ jQuery(document).ready(function($) {
             error: function(xhr, status, error) {
                 console.error('AJAX Error:', status, error);
                 console.error('Response:', xhr.responseText);
+                
+                var errorMessage = 'Failed to fetch uncategorized products. ';
+                if (status === 'timeout') {
+                    errorMessage = 'The request to fetch products timed out. The server might be busy. Please try again in a moment.';
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage += xhr.responseJSON.message;
+                }
+                
                 $loading.hide();
                 $button.prop('disabled', false);
-                $('#waicm-step2-results').html('<p style="color:red;">Failed to fetch uncategorized products. Please try again.</p>');
+                $('#waicm-step2-results').html('<div class="notice notice-error"><p>' + errorMessage + '</p></div>');
             }
         });
     });
