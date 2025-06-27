@@ -2,6 +2,7 @@
 
 Automatically categorize uncategorized WooCommerce products using the power of OpenAI.
 
+
 ## 🧠 What it does
 
 The **Woo AI Category Matcher** scans all products in your WooCommerce store that do not have a product category.  
