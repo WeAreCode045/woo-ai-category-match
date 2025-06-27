@@ -204,7 +204,7 @@ jQuery(document).ready(function($) {
             // Now process these products with the external URLs
             $.post(waicm.ajax_url, {
                 action: 'waicm_ext_check_all',
-                nonce: waicm.ext_nonce,
+                nonce: waicm.nonce,
                 products: response.data.products,
                 url1: url1,
                 url2: url2,

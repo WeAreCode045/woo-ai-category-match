@@ -327,20 +327,15 @@ class Category_Matcher {
         
         wp_enqueue_script('waicm-admin', plugin_dir_url(__FILE__) . 'assets/js/waicm.js', ['jquery'], '1.0.0', true);
         
-        // Create nonces
+        // Create a single nonce for all AJAX requests
         $nonce = wp_create_nonce('waicm_nonce');
-        $ext_nonce = wp_create_nonce('waicm_ext_nonce');
         
         // Localize the script with data
         wp_localize_script('waicm-admin', 'waicm', [
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => $nonce,
-            'ext_nonce' => $ext_nonce,
-            'ajax_nonce' => $nonce // Add this line for AJAX requests
+            'nonce' => $nonce,  // Use the same nonce for all requests
+            'ajax_nonce' => $nonce  // For backward compatibility
         ]);
-        
-        // Also set the nonce in a meta tag for reference
-        echo '<meta name="waicm_nonce" value="' . esc_attr($nonce) . '" />';
     }
     
     // Removed duplicate ajax_match_chunk method
@@ -377,7 +372,12 @@ class Category_Matcher {
     }
 
     public function ajax_ext_check_all() {
-        check_ajax_referer('waicm_ext_check_all', 'nonce');
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'waicm_nonce')) {
+            wp_send_json_error(['message' => 'Security check failed']);
+        }
+        
+        // Check user capabilities
         if (!current_user_can('manage_options')) {
             wp_send_json_error(['message' => 'Unauthorized']);
         }
