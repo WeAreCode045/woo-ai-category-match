@@ -161,3 +161,4 @@ jQuery(document).ready(function($) {
             $('#waicm-step2-results').html('<p style="color:red;">Failed to fetch uncategorized products. Please try again.</p>');
         });
     });
+});
