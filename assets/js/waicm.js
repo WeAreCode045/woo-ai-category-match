@@ -15,8 +15,8 @@ jQuery(document).ready(function($) {
         results = [];
         $('#waicm-progress-status').html('<strong>Processing uncategorized products...</strong>');
         $('#waicm-results-list').empty();
-        $('#cai-cancel-btn').show().prop('disabled', false);
-        $('#cai-start-btn').prop('disabled', true);
+        $('#waicm-cancel-btn').show().prop('disabled', false);
+        $('#waicm-start-btn').prop('disabled', true);
         processChunk();
     });
 
