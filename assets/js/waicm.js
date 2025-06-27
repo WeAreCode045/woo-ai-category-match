@@ -105,8 +105,8 @@ jQuery(document).ready(function($) {
                     }
                 });
             } else {
-                $('#cai-ext-search-loading').hide();
-                $('#cai-step2-results').html('<span style="color:red;">No uncategorized products found for external check.</span>');
+                $('#waicm-ext-search-loading').hide();
+                $('#waicm-step2-results').html('<span style="color:red;">No uncategorized products found for external check.</span>');
             }
         });
     });
