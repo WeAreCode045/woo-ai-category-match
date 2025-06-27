@@ -57,9 +57,9 @@ jQuery(document).ready(function($) {
                 }
             } else {
                 running = false;
-                $('#cai-cancel-btn').hide();
-                $('#cai-progress-status').append('<br><span style="color:red;">Error: ' + response.data.message + '</span>');
-                $('#cai-start-btn').prop('disabled', false);
+                $('#waicm-cancel-btn').hide();
+                $('#waicm-progress-status').append('<br><span style="color:red;">Error: ' + response.data.message + '</span>');
+                $('#waicm-start-btn').prop('disabled', false);
             }
         });
     }
