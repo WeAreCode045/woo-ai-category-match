@@ -3,12 +3,14 @@
  * Plugin Name: Woo AI Category Matcher
  * Description: Automatically categorize WooCommerce products using AI
  * Version: 1.0.0
- * Author: Your Name
- * Author URI: https://yourwebsite.com
+ * Author: WeAreCode045
+ * Author URI: https://github.com/WeAreCode045
  * Text Domain: woo-ai-category-matcher
  * Domain Path: /languages
- * WC requires at least: 3.0.0
- * WC tested up to: 5.0.0
+ * License: Custom – See license.txt
+ * License URI: https://github.com/WeAreCode045/woo-ai-category-matcher/blob/main/license.txt
+ * GitHub Plugin URI: https://github.com/WeAreCode045/woo-ai-category-matcher
+ * Primary Branch: main
  *
  * @package WooAICategoryMatcher
  */
