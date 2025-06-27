@@ -23,9 +23,9 @@ jQuery(document).ready(function($) {
     $('#waicm-cancel-btn').on('click', function() {
         cancelRequested = true;
         running = false;
-        $('#cai-progress-status').append('<br><span style="color:red;">Process cancelled by user.</span>');
-        $('#cai-cancel-btn').prop('disabled', true);
-        $('#cai-start-btn').prop('disabled', false);
+        $('#waicm-progress-status').append('<br><span style="color:red;">Process cancelled by user.</span>');
+        $('#waicm-cancel-btn').prop('disabled', true);
+        $('#waicm-start-btn').prop('disabled', false);
     });
 
     function processChunk() {
