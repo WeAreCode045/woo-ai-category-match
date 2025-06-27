@@ -20,7 +20,7 @@ jQuery(document).ready(function($) {
         processChunk();
     });
 
-    $('#cai-cancel-btn').on('click', function() {
+    $('#waicm-cancel-btn').on('click', function() {
         cancelRequested = true;
         running = false;
         $('#cai-progress-status').append('<br><span style="color:red;">Process cancelled by user.</span>');
