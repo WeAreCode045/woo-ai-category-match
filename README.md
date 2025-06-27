@@ -1,5 +1,6 @@
 # Woo AI Category Matcher
 
+
 Automatically categorize uncategorized WooCommerce products using the power of OpenAI.
 
 
