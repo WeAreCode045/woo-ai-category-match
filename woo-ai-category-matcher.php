@@ -11,7 +11,7 @@ Text Domain: woo-ai-category-matcher
 
 if (!defined('ABSPATH')) exit;
 
-class Category_Ai_Matcher {
+class Category_Matcher {
     const OPTION_KEY = 'cai_matcher_openai_key';
     
     public function __construct() {
