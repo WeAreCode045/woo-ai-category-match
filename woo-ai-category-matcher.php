@@ -415,29 +415,46 @@ class Category_Matcher {
         
         $results = [];
         $no_match_products = [];
-        if (!is_array($no_match_products)) $no_match_products = [];
+        $processed_count = 0;
+        
         foreach ($uncat_products as $product) {
             $best_cat = $this->get_best_category_ai($product, $cat_data, $api_key);
+            $processed_count++;
+            
             if ($best_cat) {
+                // Assign the found category
                 wp_set_object_terms($product->ID, [$best_cat['id']], 'product_cat');
                 $results[] = [
                     'product' => $product->post_title,
                     'category' => $best_cat['name'],
                 ];
             } else {
+                // Add to no match list but still count as processed
+                $no_match_products[] = [
+                    'id' => $product->ID,
+                    'title' => $product->post_title,
+                ];
                 $results[] = [
                     'product' => $product->post_title,
                     'category' => 'No match',
                 ];
+                
+                // Move to a special category to avoid reprocessing
+                wp_set_object_terms($product->ID, ['unmatched'], 'product_cat', true);
             }
+            
+            // Clear the post cache to ensure fresh data on next query
+            clean_post_cache($product->ID);
         }
-        $new_remaining = $this->count_uncategorized_products();
-        $processed = count($uncat_products); // Now counts all processed, not just updated
+        
+        // Get the new count of remaining uncategorized products
+        $remaining = $this->count_uncategorized_products();
+        
         wp_send_json_success([
+            'total' => $total_uncat,  // Original total uncategorized count
+            'processed' => $processed_count,  // Number of products processed in this batch
+            'remaining' => $remaining,  // Remaining uncategorized products
             'results' => $results,
-            'remaining' => $new_remaining,
-            'processed' => $processed,
-            'total' => $total_before,
             'no_match_count' => count($no_match_products),
             'no_match_products' => $no_match_products
         ]);
