@@ -31,17 +31,8 @@ jQuery(document).ready(function($) {
     function processChunk(currentChunk = 0) {
         if (!running || cancelRequested) return;
         
-        // Get the nonce from the meta tag as a fallback
-        var nonce = waicm.ajax_nonce || $('meta[name="waicm_nonce"]').attr('value');
-        
-        if (!nonce) {
-            console.error('Security nonce is missing. Please refresh the page and try again.');
-            return;
-        }
-        
-        console.log('Sending AJAX request with nonce:', nonce);
         console.log('Current chunk:', currentChunk);
-        
+
         // Prepare the data object
         var postData = {
             action: 'waicm_match_chunk',
@@ -53,25 +44,16 @@ jQuery(document).ready(function($) {
         // Show loading state
         $('#waicm-progress-status').html('Processing...');
         
-        // Include the nonce in the headers
-        $.ajaxSetup({
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-WP-Nonce', waicm.nonce);
-            }
-        });
-        
         $.ajax({
             url: waicm.ajax_url,
             type: 'POST',
             data: postData,
-            headers: {
-                'X-WP-Nonce': waicm.nonce
-            },
             beforeSend: function(xhr) {
                 console.log('AJAX request started');
                 // Add loading class to button
                 $('#waicm-start-btn').prop('disabled', true).text('Processing...');
             },
+
             error: function(xhr, status, error) {
                 console.error('AJAX Error:', status, error);
                 console.error('Status:', xhr.status);
