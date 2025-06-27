@@ -477,14 +477,29 @@ class Category_Matcher {
     }
 
     public function ajax_match_chunk() {
+        // Enable error logging for debugging
+        error_log('=== AJAX MATCH CHUNK STARTED ===');
+        error_log('POST data: ' . print_r($_POST, true));
+        error_log('REQUEST data: ' . print_r($_REQUEST, true));
+        
+        // Check if this is an AJAX request
+        if (!defined('DOING_AJAX') || !DOING_AJAX) {
+            error_log('Not an AJAX request');
+            wp_send_json_error(['message' => 'Invalid request']);
+        }
+        
         // Verify nonce - check both 'nonce' and '_ajax_nonce' parameters
-        $nonce = isset($_REQUEST['nonce']) ? $_REQUEST['nonce'] : (isset($_REQUEST['_ajax_nonce']) ? $_REQUEST['_ajax_nonce'] : '');
+        $nonce = isset($_POST['nonce']) ? $_POST['nonce'] : (isset($_POST['_ajax_nonce']) ? $_POST['_ajax_nonce'] : '');
+        error_log('Nonce received: ' . $nonce);
         
         if (!wp_verify_nonce($nonce, 'waicm_nonce')) {
+            error_log('Nonce verification failed');
+            error_log('Expected nonce: ' . wp_create_nonce('waicm_nonce'));
             wp_send_json_error(['message' => 'Security check failed. Please refresh the page and try again.']);
         }
         
         if (!current_user_can('manage_options')) {
+            error_log('User capability check failed');
             wp_send_json_error(['message' => 'You do not have sufficient permissions to perform this action.']);
         }
         
