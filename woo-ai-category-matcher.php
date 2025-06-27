@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Woo AI Category Matcher
  * Description: Automatically categorize WooCommerce products using AI
- * Version: 1.0.0
+ * Version: 2.0.0
  * Author: WeAreCode045
  * Author URI: https://github.com/WeAreCode045
  * Text Domain: woo-ai-category-matcher
