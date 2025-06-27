@@ -25,8 +25,8 @@ class Category_Matcher {
 
     public function add_admin_menu() {
         add_options_page(
-            'CategWory AI Matcher',
-            'Category AI Matcher',
+            'Woo AI Category Matcher',
+            'Woo AI Category Matcher',
             'manage_options',
             'category-ai-matcher',
             [$this, 'render_admin_page'] // Fixed callback method name
