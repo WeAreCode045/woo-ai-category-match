@@ -65,11 +65,11 @@ jQuery(document).ready(function($) {
     }
 
     // --- STEP 2: External Site/Category Matching ---
-    $('#cai-ext-search-btn').off('click').on('click', function() {
-        var url1 = $('#cai-ext-url-1').val().trim();
-        var url2 = $('#cai-ext-url-2').val().trim();
-        var instructions = $('#cai-ext-instructions').val().trim();
-        $('#cai-step2-results').empty();
+    $('#waicm-ext-search-btn').off('click').on('click', function() {
+        var url1 = $('#waicm-ext-url-1').val().trim();
+        var url2 = $('#waicm-ext-url-2').val().trim();
+        var instructions = $('#waicm-ext-instructions').val().trim();
+        $('#waicm-step2-results').empty();
         if (!url1 && !url2) {
             alert('Please enter at least one URL.');
             return;
