@@ -127,6 +127,31 @@ class Category_Matcher {
         ]);
     }
     
+    /**
+     * Settings section callback
+     */
+    public function settings_section_callback() {
+        echo '<p>Configure the settings for the Woo AI Category Matcher plugin.</p>';
+    }
+    
+    /**
+     * OpenAI API Key field callback
+     */
+    public function openai_key_callback() {
+        $api_key = get_option(self::OPTION_KEY, '');
+        echo '<input type="text" id="' . esc_attr(self::OPTION_KEY) . '" name="' . esc_attr(self::OPTION_KEY) . '" value="' . esc_attr($api_key) . '" class="regular-text" />';
+        echo '<p class="description">Enter your OpenAI API key. Get it from <a href="https://platform.openai.com/account/api-keys" target="_blank">OpenAI</a>.</p>';
+    }
+    
+    /**
+     * Chunk size field callback
+     */
+    public function chunk_size_callback() {
+        $chunk_size = get_option('waicm_chunk_size', 5);
+        echo '<input type="number" id="chunk_size" name="waicm_chunk_size" value="' . esc_attr($chunk_size) . '" min="1" max="20" step="1" class="small-text" />';
+        echo '<p class="description">Number of products to process in each batch (1-20). Lower values reduce server load but may be slower.</p>';
+    }
+    
     public function render_admin_page() {
         ?>
         <div class="wrap">
