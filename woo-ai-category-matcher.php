@@ -40,7 +40,7 @@ class Category_Matcher {
     public function render_admin_page() {
         ?>
         <div class="wrap">
-            <h1>Category AI Matcher</h1>
+            <h1>Woo AI Category Matcher</h1>
             <form method="post" action="options.php">
                 <?php settings_fields(self::OPTION_KEY); ?>
                 <table class="form-table">
