@@ -25,7 +25,7 @@ class Category_Matcher {
 
     public function add_admin_menu() {
         add_options_page(
-            'Category AI Matcher',
+            'CategWory AI Matcher',
             'Category AI Matcher',
             'manage_options',
             'category-ai-matcher',
