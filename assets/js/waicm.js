@@ -48,11 +48,11 @@ jQuery(document).ready(function($) {
                     $('#waicm-cancel-btn').hide();
                     $('#waicm-start-btn').prop('disabled', false);
                     if (response.data.no_match_count > 0) {
-                        var unmatchedList = $('<ul id="cai-unmatched-list"></ul>');
+                        var unmatchedList = $('<ul id="waicm-unmatched-list"></ul>');
                         response.data.no_match_products.forEach(function(prod) {
                             unmatchedList.append('<li>' + prod.title + '</li>');
                         });
-                        $('#cai-progress-status').append(unmatchedList);
+                        $('#waicm-progress-status').append(unmatchedList);
                     }
                 }
             } else {
