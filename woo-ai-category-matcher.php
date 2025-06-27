@@ -24,9 +24,9 @@ class Category_Matcher {
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
         
         // AJAX actions for logged-in users
-        add_action('wp_ajax_category_match_chunk', [$this, 'ajax_match_chunk']);
-        add_action('wp_ajax_category_ext_check_all', [$this, 'ajax_ext_check_all']);
-        add_action('wp_ajax_category_assign_found_cats', [$this, 'ajax_assign_found_cats']);
+        add_action('wp_ajax_waicm_match_chunk', [$this, 'ajax_match_chunk']);
+        add_action('wp_ajax_waicm_ext_check_all', [$this, 'ajax_ext_check_all']);
+        add_action('wp_ajax_waicm_assign_found_cats', [$this, 'ajax_assign_found_cats']);
         add_action('wp_ajax_waicm_get_uncategorized_products', [$this, 'ajax_get_uncategorized_products']);
         
         // Add nonce for security
