@@ -505,26 +505,10 @@ class Category_Matcher {
             'total_chunks' => $total_chunks,
             'current_chunk' => $current_chunk,
             'total_products' => $total_uncat,
-            'processed' => $processed,
-            'remaining' => $remaining,
-            'results' => $results
+            'processed' => 0,
+            'remaining' => $total_uncat,
+            'results' => []
         ]);
-    }        'product' => $product->post_title,
-                    'category' => 'No match',
-                ];
-                
-                // Move to a special category to avoid reprocessing
-                wp_set_object_terms($product->ID, ['unmatched'], 'product_cat', true);
-{{ ... }}
-            
-            // Clear the post cache to ensure fresh data on next query
-            clean_post_cache($product->ID);
-        }
-        
-        // Get the new count of remaining uncategorized products
-        $remaining = $this->count_uncategorized_products();
-        
-        wp_send_json_success([
             'total' => $total_uncat,  // Original total uncategorized count
             'processed' => $processed_count,  // Number of products processed in this batch
             'remaining' => $remaining,  // Remaining uncategorized products
