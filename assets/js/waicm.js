@@ -52,16 +52,38 @@ jQuery(document).ready(function($) {
         
         console.log('POST data:', postData);
         
+        // Show loading state
+        $('#waicm-progress-status').html('Processing...');
+        
         $.ajax({
             url: waicm.ajax_url,
             type: 'POST',
             data: postData,
             beforeSend: function(xhr) {
                 console.log('AJAX request started');
+                // Add loading class to button
+                $('#waicm-start-btn').prop('disabled', true).text('Processing...');
             },
             error: function(xhr, status, error) {
                 console.error('AJAX Error:', status, error);
                 console.error('Response:', xhr.responseText);
+                
+                // Parse the response if possible
+                var errorMsg = 'An error occurred. Please try again.';
+                try {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.data && response.data.message) {
+                        errorMsg = response.data.message;
+                    } else if (response.message) {
+                        errorMsg = response.message;
+                    }
+                } catch (e) {
+                    console.error('Error parsing error response:', e);
+                }
+                
+                // Show error to user
+                $('#waicm-progress-status').html('<span style="color:red;">Error: ' + errorMsg + '</span>');
+                $('#waicm-start-btn').prop('disabled', false).text('Start AI Categorization');
             },
             dataType: 'json',
             success: function(response) {
