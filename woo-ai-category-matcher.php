@@ -203,16 +203,16 @@ class Category_Matcher {
     }
     public function enqueue_admin_scripts($hook) {
         if ($hook !== 'settings_page_category-ai-matcher') return;
-        wp_enqueue_script('cai-matcher-js', plugins_url('wp-category-ai-matcher.js', __FILE__), ['jquery'], null, true);
-        wp_localize_script('cai-matcher-js', 'caiMatcher', [
+        wp_enqueue_script('waicm-matcher-js', plugins_url('wp-category-ai-matcher.js', __FILE__), ['jquery'], null, true);
+        wp_localize_script('waicm-matcher-js', 'waicmMatcher', [
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('cai_match_chunk'),
-            'ext_nonce' => wp_create_nonce('cai_ext_check_all'),
+            'nonce' => wp_create_nonce('waicm_match_chunk'),
+            'ext_nonce' => wp_create_nonce('waicm_ext_check_all'),
         ]);
     }
 
     public function ajax_assign_found_cats() {
-        check_ajax_referer('cai_ext_check_all', 'nonce');
+        check_ajax_referer('waicm_ext_check_all', 'nonce');
         if (!current_user_can('manage_options')) {
             wp_send_json_error(['message' => 'Unauthorized']);
         }
@@ -243,7 +243,7 @@ class Category_Matcher {
     }
 
     public function ajax_ext_check_all() {
-        check_ajax_referer('cai_ext_check_all', 'nonce');
+        check_ajax_referer('waicm_ext_check_all', 'nonce');
         if (!current_user_can('manage_options')) {
             wp_send_json_error(['message' => 'Unauthorized']);
         }
@@ -343,7 +343,7 @@ class Category_Matcher {
     }
 
     public function ajax_match_chunk() {
-        check_ajax_referer('cai_match_chunk', 'nonce');
+        check_ajax_referer('waicm_match_chunk', 'nonce');
         if (!current_user_can('manage_options')) {
             wp_send_json_error(['message' => 'Unauthorized']);
         }
