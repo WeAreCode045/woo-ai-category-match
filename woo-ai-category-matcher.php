@@ -484,22 +484,35 @@ class Category_Matcher {
         
         // Check if this is an AJAX request
         if (!defined('DOING_AJAX') || !DOING_AJAX) {
-            error_log('Not an AJAX request');
-            wp_send_json_error(['message' => 'Invalid request']);
+            $error = 'Not an AJAX request. DOING_AJAX: ' . (defined('DOING_AJAX') ? 'defined' : 'not defined');
+            error_log($error);
+            wp_send_json_error(['message' => $error]);
         }
         
         // Verify nonce - check both 'nonce' and '_ajax_nonce' parameters
         $nonce = isset($_POST['nonce']) ? $_POST['nonce'] : (isset($_POST['_ajax_nonce']) ? $_POST['_ajax_nonce'] : '');
         error_log('Nonce received: ' . $nonce);
         
-        if (!wp_verify_nonce($nonce, 'waicm_nonce')) {
-            error_log('Nonce verification failed');
-            error_log('Expected nonce: ' . wp_create_nonce('waicm_nonce'));
+        if (empty($nonce)) {
+            $error = 'No nonce provided in the request';
+            error_log($error);
+            wp_send_json_error(['message' => $error]);
+        }
+        
+        $verified = wp_verify_nonce($nonce, 'waicm_nonce');
+        
+        if ($verified === false) {
+            $error = 'Nonce verification failed. Received: ' . $nonce . 
+                   ', Expected: ' . wp_create_nonce('waicm_nonce') . 
+                   ', Current user ID: ' . get_current_user_id();
+            error_log($error);
             wp_send_json_error(['message' => 'Security check failed. Please refresh the page and try again.']);
         }
         
         if (!current_user_can('manage_options')) {
-            error_log('User capability check failed');
+            $error = 'User capability check failed. Current user ID: ' . get_current_user_id() . 
+                   ', Capabilities: ' . print_r(wp_get_current_user()->allcaps, true);
+            error_log($error);
             wp_send_json_error(['message' => 'You do not have sufficient permissions to perform this action.']);
         }
         
