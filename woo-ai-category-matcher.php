@@ -18,7 +18,7 @@ class Category_Matcher {
         add_action('admin_menu', [$this, 'add_admin_menu']);
         add_action('admin_init', [$this, 'register_settings']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
-        add_action('wp_ajax_cai_match_chunk', [$this, 'ajax_match_chunk']);
+        add_action('wp_ajax_c_match_chunk', [$this, 'ajax_match_chunk']);
         add_action('wp_ajax_cai_ext_check_all', [$this, 'ajax_ext_check_all']);
         add_action('wp_ajax_cai_assign_found_cats', [$this, 'ajax_assign_found_cats']);
     }
