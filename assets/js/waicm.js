@@ -45,8 +45,6 @@ jQuery(document).ready(function($) {
         // Prepare the data object
         var postData = {
             action: 'waicm_match_chunk',
-            _ajax_nonce: nonce,
-            nonce: nonce,
             current_chunk: currentChunk || 0
         };
         
@@ -55,10 +53,20 @@ jQuery(document).ready(function($) {
         // Show loading state
         $('#waicm-progress-status').html('Processing...');
         
+        // Include the nonce in the headers
+        $.ajaxSetup({
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-WP-Nonce', waicm.nonce);
+            }
+        });
+        
         $.ajax({
             url: waicm.ajax_url,
             type: 'POST',
             data: postData,
+            headers: {
+                'X-WP-Nonce': waicm.nonce
+            },
             beforeSend: function(xhr) {
                 console.log('AJAX request started');
                 // Add loading class to button
