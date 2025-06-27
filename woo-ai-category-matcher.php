@@ -184,6 +184,7 @@ class Category_Matcher {
                 <div id="waicm-step2-wrap" style="padding:15px;border:1px solid #0073aa;background:#f5faff;">
                     <h3>Step 2: Find Categories from External Sites</h3>
                     <div id="waicm-step2-status"></div>
+                    <div id="waicm-step2-progress-status" style="margin: 10px 0;"></div>
                     <label>External Site 1 URL: <input type="text" id="waicm-ext-url-1" size="40"></label><br>
                     <label>External Site 2 URL: <input type="text" id="waicm-ext-url-2" size="40"></label><br>
                     <label>Instructions for AI (optional):<br>
