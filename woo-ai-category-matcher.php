@@ -1,9 +1,12 @@
 <?php
 /*
-Plugin Name: Category AI Matcher
-Description: Assigns the most relevant WooCommerce category to uncategorized products using OpenAI.
+Plugin Name: Woo AI Category Matcher
+Description: Automatically categorizes uncategorized products using AI.
 Version: 1.0.0
-Author: Code045
+Author: Your Name
+License: Custom – See license.txt
+License URI: https://github.com/your-repo/woo-ai-category-matcher/blob/main/license.txt
+Text Domain: woo-ai-category-matcher
 */
 
 if (!defined('ABSPATH')) exit;
