@@ -99,9 +99,9 @@ jQuery(document).ready(function($) {
                             resHtml += '<li><strong>' + prod.title + ':</strong> ' + prod.category + '</li>';
                         });
                         resHtml += '</ul>';
-                        $('#cai-step2-results').html(resHtml);
+                        $('#waicm-step2-results').html(resHtml);
                     } else {
-                        $('#cai-step2-results').html('<span style="color:red;">Error: ' + (response2.data && response2.data.message ? response2.data.message : 'Unknown error') + '</span>');
+                        $('#waicm-step2-results').html('<span style="color:red;">Error: ' + (response2.data && response2.data.message ? response2.data.message : 'Unknown error') + '</span>');
                     }
                 });
             } else {
