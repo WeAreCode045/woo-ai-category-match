@@ -12,6 +12,7 @@ License URI: https://github.com/WeAreCode045/woo-ai-category-matcher/blob/main/l
 GitHub Plugin URI: https://github.com/WeAreCode045/woo-ai-category-matcher
 Primary Branch: main
 */
+
 if (!defined('ABSPATH')) exit;
 
 class Category_Matcher {
