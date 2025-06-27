@@ -478,4 +478,4 @@ class Woo_AI_Category_Matcher {
 
 }
 
-new Category_Matcher();
+new Woo_AI_Category_Matcher();
