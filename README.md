@@ -3,8 +3,6 @@
 Tired of manually categorizing hundreds of WooCommerce products?
 Let AI do the work for you by analyzing product titles and descriptions to determine and assign the most relevant product category.
 
-Automatically categorize uncategorized WooCommerce products using the power of OpenAI.
-
 
 ## 🧠 What it does
 
