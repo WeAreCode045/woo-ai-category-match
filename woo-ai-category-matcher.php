@@ -23,15 +23,13 @@ if (!defined('WPINC')) {
 // Define plugin constants
 define('WAICM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WAICM_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('WAICM_OPTION_KEY', 'waicm_openai_api_key');
 
 /**
  * Main plugin class
  */
 class Woo_AI_Category_Matcher {
-    /**
-     * Option key for storing the OpenAI API key
-     */
-    const OPTION_KEY = 'waicm_openai_api_key';
+
     /**
      * Instance of the plugin
      *
@@ -198,7 +196,7 @@ class Woo_AI_Category_Matcher {
         );
         
         // Get API key for localization
-        $api_key = get_option(self::OPTION_KEY);
+        $api_key = get_option(WAICM_OPTION_KEY);
         
         // Localize script with necessary data
         wp_localize_script('category-matcher', 'waicmData', [
@@ -390,7 +388,7 @@ class Woo_AI_Category_Matcher {
             wp_send_json_error(['message' => 'You do not have sufficient permissions to perform this action.']);
         }
         
-        $api_key = get_option(self::OPTION_KEY);
+        $api_key = get_option(WAICM_OPTION_KEY);
         if (!$api_key) {
             wp_send_json_error(['message' => 'OpenAI API key is missing.']);
         }
