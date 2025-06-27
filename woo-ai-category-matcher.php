@@ -3,7 +3,7 @@
 Plugin Name: Woo AI Category Matcher
 Description: Automatically categorizes uncategorized products using AI.
 Version: 1.0.0
-Author: Your Name
+Author: Code045
 License: Custom – See license.txt
 License URI: https://github.com/your-repo/woo-ai-category-matcher/blob/main/license.txt
 Text Domain: woo-ai-category-matcher
