@@ -76,8 +76,12 @@ jQuery(document).ready(function($) {
         }
         $('#waicm-ext-search-loading').show();
         $.post(waicm.ajax_url, {
-            action: 'waicm_match_chunk',
-            nonce: waicm.nonce
+            action: 'waicm_ext_check_all',
+            nonce: waicm.ext_nonce,
+            products: response.data.no_match_products,
+            url1: url1,
+            url2: url2,
+            instructions: instructions
         }, function(response) {
             if (response.success && response.data.no_match_products && response.data.no_match_products.length > 0) {
                 $.post(caiMatcher.ajax_url, {
