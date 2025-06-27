@@ -52,7 +52,7 @@ class Category_Matcher {
                 <?php submit_button(); ?>
             </form>
             <hr>
-            <div id="cai-main-wrap">
+            <div id="waicm-main-wrap">
                 <!-- Step 1: AI Auto-categorization -->
                 <div id="cai-step1-wrap" style="margin-bottom:30px;padding:15px;border:1px solid #0073aa;background:#f9f9f9;">
                     <h3>Step 1: Auto-categorize uncategorized products</h3>
